@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEURAL TRADER BTC - AI Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;900&display=swap');
+
+        :root {
+            --bg-dark: #05070a;
+            --neural-green: #10b981;
+            --neural-glow: rgba(16, 185, 129, 0.4);
+        }
+
+        body { 
+            background-color: var(--bg-dark); 
+            font-family: 'Inter', sans-serif; 
+            color: #f8fafc;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .glass-card { 
+            background: rgba(13, 17, 23, 0.8); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* --- LOGOTIPO PULSANTE --- */
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .brain-logo-wrapper {
+            position: relative;
+            width: 45px;
+            height: 45px;
+            filter: drop-shadow(0 0 12px var(--neural-glow));
+        }
+
+        @media (min-width: 768px) {
+            .brain-logo-wrapper { width: 55px; height: 55px; }
+            .logo-container { gap: 15px; }
+        }
+
+        .node { animation: pulse-node 2s infinite ease-in-out; }
+        @keyframes pulse-node {
+            0%, 100% { opacity: 0.4; r: 1.5; fill: #10b981; }
+            50% { opacity: 1; r: 3.5; fill: #34d399; }
+        }
+
+        .ticker-container {
+            width: 100%; overflow: hidden; background: #000; border-bottom: 1px solid #1e293b;
+            white-space: nowrap; padding: 8px 0; position: relative; z-index: 101;
+        }
+        .ticker-wrapper { display: inline-block; white-space: nowrap; animation: ticker-move 45s linear infinite; }
+        @keyframes ticker-move { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+
+        /* --- MÉDIAS MÓVEIS --- */
+        .ma-bar { height: 6px; border-radius: 99px; background: rgba(30, 41, 59, 0.5); position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .ma-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 99px; box-shadow: 0 0 10px currentColor; }
+        
+        /* --- ELLIOTT WAVE ANIMATIONS --- */
+        .wave-path { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 4s forwards cubic-bezier(0.45, 0.05, 0.55, 0.95); }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+        
+        .elliott-active-dot { animation: elliott-pulse 1.2s infinite alternate; }
+        @keyframes elliott-pulse {
+            from { r: 4; opacity: 0.8; filter: blur(1px); }
+            to { r: 8; opacity: 1; filter: blur(4px); stroke-width: 4; }
+        }
+
+        .status-pulse { animation: status-pulse 2s infinite; }
+        @keyframes status-pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+        /* --- LIQUIDAÇÕES VIVAS --- */
+        .liq-stream { font-size: 11px; font-family: 'JetBrains Mono'; height: 90px; overflow-y: hidden; }
+        .liq-item { animation: fadeIn 0.4s ease-out; margin-bottom: 6px; padding: 4px 8px; border-radius: 4px; background: rgba(255,255,255,0.02); border-left: 2px solid currentColor; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
+
+        .btn-neural { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .btn-neural:active { transform: scale(0.95); }
+
+        /* VELOCÍMETRO: VALOR 8 (ESQUERDA) */
+        #gauge-needle-group {
+            transform-origin: 100px 100px;
+            transition: transform 2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: rotate(-75.6deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <div id="toast" class="fixed top-24 left-1/2 -translate-x-1/2 z-[1000] hidden w-[90%] max-w-xs">
+        <div class="bg-emerald-600 text-white px-6 py-3 rounded-full shadow-2xl flex items-center justify-center gap-3 border border-emerald-400/30">
+            <i class="fas fa-bolt text-xs"></i>
+            <span id="toast-msg" class="text-[10px] font-black uppercase tracking-widest text-center">Sinal Processado</span>
+        </div>
+    </div>
+
+    <div class="ticker-container">
+        <div class="ticker-wrapper" id="ticker-content"></div>
+    </div>
+
+    <nav class="border-b border-white/5 bg-black/60 backdrop-blur-xl px-4 md:px-6 py-3 md:py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="logo-container">
+            <div class="brain-logo-wrapper">
+                <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <path d="M50,15 C35,15 20,25 20,50 C20,75 35,85 50,85 L50,15" fill="#10b981" fill-opacity="0.9" stroke="#064e3b" stroke-width="1.5"/>
+                    <g transform="translate(50, 15)">
+                        <path d="M0,0 C15,0 30,10 30,35 C30,60 15,70 0,70" fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="2,2"/>
+                        <circle cx="25" cy="25" r="3" class="node" />
+                        <circle cx="15" cy="45" r="3" class="node" style="animation-delay: 0.5s" />
+                        <circle cx="28" cy="15" r="3" class="node" style="animation-delay: 1.2s" />
+                    </g>
+                    <rect x="49" y="15" width="2" height="70" fill="rgba(0,0,0,0.3)"/>
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-lg md:text-xl font-black tracking-tighter text-white uppercase italic leading-none">NEURAL TRADER <span class="text-emerald-500">BTC</span></h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 status-pulse"></div>
+                    <span class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Cérebro Ativo</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col items-end">
+            <div class="flex items-baseline gap-2 md:gap-3">
+                <p id="live-price-pct" class="text-[10px] md:text-sm font-black mono text-emerald-500">+0.00%</p>
+                <p id="live-price" class="text-lg md:text-3xl font-black tracking-tighter text-white tabular-nums">$ 0.00</p>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 p-4 md:p-8 grid grid-cols-12 gap-4 md:gap-6 max-w-[1700px] mx-auto w-full">
+        
+        <!-- COLUNA 1: PSICOLOGIA E MÉDIAS -->
+        <div class="col-span-12 lg:col-span-3 order-2 lg:order-1 space-y-4 md:y-6">
+            <!-- GAUGE -->
+            <div class="glass-card rounded-3xl p-6 relative overflow-hidden border-t-2 border-emerald-500/20">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6 text-center italic">Psicologia (F&G)</h3>
+                <div class="relative w-full h-28 md:h-32 mx-auto flex justify-center items-end">
+                    <svg viewBox="0 0 200 120" class="w-48 md:w-56 h-28 md:h-32 overflow-visible">
+                        <defs>
+                            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#ef4444" /> 
+                                <stop offset="50%" stop-color="#fbbf24" /> 
+                                <stop offset="100%" stop-color="#10b981" /> 
+                            </linearGradient>
+                        </defs>
+                        <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#1e293b" stroke-width="12" stroke-linecap="round" />
+                        <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGradient)" stroke-width="12" stroke-linecap="round" opacity="0.8" />
+                        <g id="gauge-needle-group">
+                            <path d="M 100 100 L 100 25" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+                            <circle cx="100" cy="100" r="8" fill="#05070a" stroke="#ffffff" stroke-width="2"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="text-center mt-2 italic">
+                    <div class="text-3xl md:text-4xl font-black text-white mono" id="fg-value">8</div>
+                    <div id="fg-text" class="text-[10px] font-bold text-red-500 uppercase tracking-widest mt-1">Medo Extremo</div>
+                </div>
+            </div>
+
+            <!-- MÉDIAS COM A 200 -->
+            <div class="glass-card rounded-3xl p-6 border-l-4 border-emerald-500">
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 italic">Cluster de Médias</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-[10px] mono mb-1">
+                            <span class="text-red-400">Fast (8)</span>
+                            <span id="ma8-val" class="text-white">$ --</span>
+                        </div>
+                        <div class="ma-bar"><div id="ma8-bar" class="ma-fill bg-red-500 w-0"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] mono mb-1">
+                            <span class="text-orange-400">Short (21)</span>
+                            <span id="ma21-val" class="text-white">$ --</span>
+                        </div>
+                        <div class="ma-bar"><div id="ma21-bar" class="ma-fill bg-orange-500 w-0"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] mono mb-1">
+                            <span class="text-blue-400">Trend (100)</span>
+                            <span id="ma100-val" class="text-white">$ --</span>
+                        </div>
+                        <div class="ma-bar"><div id="ma100-bar" class="ma-fill bg-blue-500 w-0"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] mono mb-1">
+                            <span class="text-yellow-500 font-black italic">Macro (200)</span>
+                            <span id="ma200-val" class="text-white">$ --</span>
+                        </div>
+                        <div class="ma-bar"><div id="ma200-bar" class="ma-fill bg-yellow-500 w-0"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUNA 2: GRÁFICO (CENTRO) -->
+        <div class="col-span-12 lg:col-span-6 order-1 lg:order-2 space-y-4 md:space-y-6">
+            <div class="glass-card rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-white/5 h-[350px] md:h-[550px] relative">
+                <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&interval=D&theme=dark&style=1&timezone=Etc%2FUTC&hide_side_toolbar=1" class="w-full h-full"></iframe>
+                <div class="absolute top-4 left-4 md:top-6 md:left-6 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-[8px] md:text-[10px] font-black text-white mono uppercase tracking-widest">Feed Neural</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
+                <div class="glass-card rounded-2xl p-3 md:p-4 text-center border-b-2 border-red-500/40">
+                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">RSI IA</p>
+                    <p id="rsi-val" class="text-sm md:text-xl font-black mono text-red-400 italic">--</p>
+                </div>
+                <div class="glass-card rounded-2xl p-3 md:p-4 text-center border-b-2 border-yellow-500/40">
+                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">Sup. Fibo</p>
+                    <p id="dist-support" class="text-sm md:text-xl font-black mono text-yellow-500 italic">--%</p>
+                </div>
+                <div class="glass-card rounded-2xl p-3 md:p-4 text-center border-b-2 border-blue-500/40">
+                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">Volatilidade</p>
+                    <p class="text-sm md:text-xl font-black mono text-blue-400 italic">CRÍTICA</p>
+                </div>
+                <div class="glass-card rounded-2xl p-3 md:p-4 text-center border-b-2 border-emerald-500/40">
+                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">Flow</p>
+                    <p class="text-sm md:text-xl font-black mono text-emerald-400 italic animate-pulse">LIVE</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUNA 3: ELLIOTT E ACÇÕES -->
+        <div class="col-span-12 lg:col-span-3 order-3 space-y-4 md:space-y-6">
+            <div class="glass-card rounded-3xl p-5 border-t-2 border-emerald-500/20">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Elliott Wave</h3>
+                    <span class="text-[8px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 mono">D1 CYCLE</span>
+                </div>
+                <div class="h-32 md:h-40 w-full relative bg-black/30 rounded-2xl p-4 overflow-visible">
+                    <svg viewBox="0 0 240 120" class="w-full h-full overflow-visible font-bold">
+                        <defs>
+                            <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ef4444;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M10,100 L45,45 L75,75 L125,20 L155,55 L195,15" fill="none" stroke="url(#waveGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="wave-path" />
+                        <path d="M195,15 L215,65 L235,105" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="wave-path" />
+                        
+                        <g fill="#10b981" font-size="9" class="mono">
+                            <circle cx="45" cy="45" r="5" fill="#05070a" stroke="#10b981" stroke-width="1"/>
+                            <text x="43" y="48">1</text>
+                            <circle cx="125" cy="20" r="5" fill="#05070a" stroke="#fbbf24" stroke-width="1"/>
+                            <text x="123" y="23" fill="#fbbf24">3</text>
+                        </g>
+
+                        <g>
+                            <circle cx="235" cy="105" r="6" fill="#ef4444" class="elliott-active-dot" />
+                            <text x="165" y="118" fill="#ef4444" font-size="10" font-weight="900" class="italic uppercase">Ⓒ CAPITULANDO</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-6">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 text-center italic text-emerald-400">Terminal de Execução</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="handleOrder('LONG')" class="btn-neural bg-emerald-600 py-4 rounded-xl text-white font-black text-[11px] shadow-[0_0_15px_rgba(16,185,129,0.3)]">BUY</button>
+                    <button onclick="handleOrder('SHORT')" class="btn-neural bg-red-600 py-4 rounded-xl text-white font-black text-[11px] shadow-[0_0_15px_rgba(239,68,68,0.3)]">SELL</button>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-6 hidden md:block">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase mb-4 italic">Liquid. Recentes</h3>
+                <div id="liq-stream" class="liq-stream"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const state = {
+            btcPrice: 0,
+            fibSupport: 51200,
+            tickerData: { "BTC": { p: 0, c: 0 }, "ETH": { p: 0, c: 0 }, "SOL": { p: 0, c: 0 } }
+        };
+
+        const elements = {
+            price: document.getElementById('live-price'),
+            pricePct: document.getElementById('live-price-pct'),
+            ticker: document.getElementById('ticker-content'),
+            rsi: document.getElementById('rsi-val'),
+            distSupport: document.getElementById('dist-support'),
+            maValues: { ma8: document.getElementById('ma8-val'), ma21: document.getElementById('ma21-val'), ma100: document.getElementById('ma100-val'), ma200: document.getElementById('ma200-val') },
+            maBars: { ma8: document.getElementById('ma8-bar'), ma21: document.getElementById('ma21-bar'), ma100: document.getElementById('ma100-bar'), ma200: document.getElementById('ma200-bar') }
+        };
+
+        function updateMAs(price) {
+            const vals = { ma8: price * 0.99, ma21: price * 0.98, ma100: price * 0.94, ma200: price * 0.89 };
+            Object.keys(vals).forEach(k => {
+                if(elements.maValues[k]) elements.maValues[k].textContent = `$${vals[k].toLocaleString(undefined, {maximumFractionDigits:0})}`;
+                if(elements.maBars[k]) elements.maBars[k].style.width = `${40 + Math.random() * 50}%`;
+            });
+        }
+
+        function renderTicker() {
+            const content = Object.entries(state.tickerData).map(([s, d]) => {
+                const isPos = d.c >= 0;
+                return `<span class="mx-6 md:mx-8 inline-flex items-center gap-2"><span class="text-slate-500 font-black text-[10px] md:text-[11px] italic">${s}</span><span class="text-white mono font-bold text-[10px] md:text-[11px]">$${d.p.toLocaleString()}</span><span class="${isPos ? 'text-emerald-500' : 'text-red-500'} mono font-black text-[9px] md:text-[10px]">${isPos ? '▲' : '▼'} ${d.c.toFixed(2)}%</span></span>`;
+            }).join('');
+            elements.ticker.innerHTML = content + content;
+        }
+
+        function pushLiquidation() {
+            const isLong = Math.random() > 0.4;
+            const item = document.createElement('div');
+            item.className = `liq-item flex justify-between ${isLong ? 'text-red-400' : 'text-emerald-400'}`;
+            item.innerHTML = `<span>BTC ${isLong ? 'LONG' : 'SHORT'}</span><span class="font-bold">$${(Math.random() * 800).toFixed(1)}K</span>`;
+            const container = document.getElementById('liq-stream');
+            if(!container) return;
+            container.prepend(item);
+            if(container.children.length > 4) container.removeChild(container.lastChild);
+        }
+
+        function handleOrder(type) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = `ORDEM ${type} EXECUTADA`;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 2000);
+        }
+
+        function initWebSocket() {
+            const ws = new WebSocket(`wss://stream.binance.com:9443/ws/btcusdt@ticker/ethusdt@ticker/solusdt@ticker`);
+            ws.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                const sym = data.s.replace('USDT', '');
+                state.tickerData[sym] = { p: parseFloat(data.c), c: parseFloat(data.P) };
+                
+                if (sym === 'BTC') {
+                    state.btcPrice = state.tickerData[sym].p;
+                    elements.price.textContent = `$${state.btcPrice.toLocaleString('en-US', {minimumFractionDigits:2})}`;
+                    elements.pricePct.textContent = `${state.tickerData[sym].c >= 0 ? '+' : ''}${state.tickerData[sym].c.toFixed(2)}%`;
+                    elements.pricePct.className = `text-[10px] md:text-sm font-black mono ${state.tickerData[sym].c >= 0 ? 'text-emerald-500' : 'text-red-500'}`;
+                    elements.rsi.textContent = Math.floor(15 + Math.random() * 15);
+                    elements.distSupport.textContent = `${(((state.btcPrice - state.fibSupport) / state.btcPrice) * 100).toFixed(1)}%`;
+                    updateMAs(state.btcPrice);
+                    if(Math.random() > 0.9) pushLiquidation();
+                }
+                renderTicker();
+            };
+        }
+
+        window.onload = initWebSocket;
+    </script>
+</body>
+</html>
+
