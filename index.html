@@ -15,24 +15,23 @@
             --neural-glow: rgba(16, 185, 129, 0.4);
         }
 
-        body { 
-            background-color: var(--bg-dark); 
-            font-family: 'Inter', sans-serif; 
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
             color: #f8fafc;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
-        
-        .glass-card { 
-            background: rgba(13, 17, 23, 0.8); 
-            border: 1px solid rgba(255,255,255,0.08); 
+
+        .glass-card {
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid rgba(255,255,255,0.08);
             backdrop-filter: blur(16px);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
 
         .mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* --- LOGOTIPO PULSANTE --- */
         .logo-container { display: flex; align-items: center; gap: 10px; }
         .brain-logo-wrapper {
             position: relative;
@@ -59,24 +58,15 @@
         .ticker-wrapper { display: inline-block; white-space: nowrap; animation: ticker-move 45s linear infinite; }
         @keyframes ticker-move { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
 
-        /* --- MÉDIAS MÓVEIS --- */
         .ma-bar { height: 6px; border-radius: 99px; background: rgba(30, 41, 59, 0.5); position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
         .ma-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 99px; box-shadow: 0 0 10px currentColor; }
-        
-        /* --- ELLIOTT WAVE ANIMATIONS --- */
-        .wave-path { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 4s forwards cubic-bezier(0.45, 0.05, 0.55, 0.95); }
+
+        .wave-path { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 1.5s forwards cubic-bezier(0.45, 0.05, 0.55, 0.95); }
         @keyframes draw { to { stroke-dashoffset: 0; } }
-        
-        .elliott-active-dot { animation: elliott-pulse 1.2s infinite alternate; }
-        @keyframes elliott-pulse {
-            from { r: 4; opacity: 0.8; filter: blur(1px); }
-            to { r: 8; opacity: 1; filter: blur(4px); stroke-width: 4; }
-        }
 
         .status-pulse { animation: status-pulse 2s infinite; }
         @keyframes status-pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
 
-        /* --- LIQUIDAÇÕES VIVAS --- */
         .liq-stream { font-size: 11px; font-family: 'JetBrains Mono'; height: 90px; overflow-y: hidden; }
         .liq-item { animation: fadeIn 0.4s ease-out; margin-bottom: 6px; padding: 4px 8px; border-radius: 4px; background: rgba(255,255,255,0.02); border-left: 2px solid currentColor; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
@@ -84,11 +74,11 @@
         .btn-neural { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
         .btn-neural:active { transform: scale(0.95); }
 
-        /* VELOCÍMETRO: VALOR 8 (ESQUERDA) */
+        /* Ponteiro do gauge: posição inicial neutra (0). É recalculado via JS assim que o índice real chega. */
         #gauge-needle-group {
             transform-origin: 100px 100px;
             transition: transform 2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform: rotate(-75.6deg);
+            transform: rotate(-90deg);
         }
     </style>
 </head>
@@ -123,7 +113,7 @@
                 <h1 class="text-lg md:text-xl font-black tracking-tighter text-white uppercase italic leading-none">NEURAL TRADER <span class="text-emerald-500">BTC</span></h1>
                 <div class="flex items-center gap-2 mt-1">
                     <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 status-pulse"></div>
-                    <span class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Cérebro Ativo</span>
+                    <span id="conn-status" class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Conectando…</span>
                 </div>
             </div>
         </div>
@@ -136,19 +126,18 @@
     </nav>
 
     <main class="flex-1 p-4 md:p-8 grid grid-cols-12 gap-4 md:gap-6 max-w-[1700px] mx-auto w-full">
-        
+
         <!-- COLUNA 1: PSICOLOGIA E MÉDIAS -->
         <div class="col-span-12 lg:col-span-3 order-2 lg:order-1 space-y-4 md:y-6">
-            <!-- GAUGE -->
             <div class="glass-card rounded-3xl p-6 relative overflow-hidden border-t-2 border-emerald-500/20">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6 text-center italic">Psicologia (F&G)</h3>
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6 text-center italic">Psicologia (F&G) · Fonte: alternative.me</h3>
                 <div class="relative w-full h-28 md:h-32 mx-auto flex justify-center items-end">
                     <svg viewBox="0 0 200 120" class="w-48 md:w-56 h-28 md:h-32 overflow-visible">
                         <defs>
                             <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#ef4444" /> 
-                                <stop offset="50%" stop-color="#fbbf24" /> 
-                                <stop offset="100%" stop-color="#10b981" /> 
+                                <stop offset="0%" stop-color="#ef4444" />
+                                <stop offset="50%" stop-color="#fbbf24" />
+                                <stop offset="100%" stop-color="#10b981" />
                             </linearGradient>
                         </defs>
                         <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#1e293b" stroke-width="12" stroke-linecap="round" />
@@ -160,14 +149,13 @@
                     </svg>
                 </div>
                 <div class="text-center mt-2 italic">
-                    <div class="text-3xl md:text-4xl font-black text-white mono" id="fg-value">8</div>
-                    <div id="fg-text" class="text-[10px] font-bold text-red-500 uppercase tracking-widest mt-1">Medo Extremo</div>
+                    <div class="text-3xl md:text-4xl font-black text-white mono" id="fg-value">--</div>
+                    <div id="fg-text" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Carregando…</div>
                 </div>
             </div>
 
-            <!-- MÉDIAS COM A 200 -->
             <div class="glass-card rounded-3xl p-6 border-l-4 border-emerald-500">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 italic">Cluster de Médias</h3>
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 italic">Cluster de Médias (real, klines 1h)</h3>
                 <div class="space-y-4">
                     <div>
                         <div class="flex justify-between text-[10px] mono mb-1">
@@ -204,40 +192,47 @@
         <!-- COLUNA 2: GRÁFICO (CENTRO) -->
         <div class="col-span-12 lg:col-span-6 order-1 lg:order-2 space-y-4 md:space-y-6">
             <div class="glass-card rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-white/5 h-[350px] md:h-[550px] relative">
-                <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&interval=D&theme=dark&style=1&timezone=Etc%2FUTC&hide_side_toolbar=1" class="w-full h-full"></iframe>
+                <canvas id="liveChart" class="w-full h-full"></canvas>
                 <div class="absolute top-4 left-4 md:top-6 md:left-6 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-[8px] md:text-[10px] font-black text-white mono uppercase tracking-widest">Feed Neural</span>
+                    <span id="chart-status-dot" class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                    <span id="chart-status-text" class="text-[8px] md:text-[10px] font-black text-white mono uppercase tracking-widest">Feed Neural · conectando…</span>
+                </div>
+                <div class="absolute top-4 right-4 md:top-6 md:right-6 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                    <span class="text-[8px] md:text-[10px] font-black text-white mono uppercase tracking-widest">1m · BTCUSDT · Binance</span>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
                 <div class="glass-card rounded-2xl p-3 md:p-4 text-center border-b-2 border-red-500/40">
-                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">RSI IA</p>
+                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">RSI (14, Wilder)</p>
                     <p id="rsi-val" class="text-sm md:text-xl font-black mono text-red-400 italic">--</p>
                 </div>
                 <div class="glass-card rounded-2xl p-3 md:p-4 text-center border-b-2 border-yellow-500/40">
-                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">Sup. Fibo</p>
+                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">Dist. Fibo 61.8%</p>
                     <p id="dist-support" class="text-sm md:text-xl font-black mono text-yellow-500 italic">--%</p>
                 </div>
                 <div class="glass-card rounded-2xl p-3 md:p-4 text-center border-b-2 border-blue-500/40">
-                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">Volatilidade</p>
-                    <p class="text-sm md:text-xl font-black mono text-blue-400 italic">CRÍTICA</p>
+                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">Volatilidade (real)</p>
+                    <p id="vol-val" class="text-sm md:text-xl font-black mono text-blue-400 italic">--</p>
                 </div>
                 <div class="glass-card rounded-2xl p-3 md:p-4 text-center border-b-2 border-emerald-500/40">
-                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">Flow</p>
-                    <p class="text-sm md:text-xl font-black mono text-emerald-400 italic animate-pulse">LIVE</p>
+                    <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase mb-1">Flow (taker buy/sell)</p>
+                    <p id="flow-val" class="text-sm md:text-xl font-black mono text-emerald-400 italic">--</p>
                 </div>
             </div>
         </div>
 
-        <!-- COLUNA 3: ELLIOTT E ACÇÕES -->
+        <!-- COLUNA 3: ESTRUTURA E AÇÕES -->
         <div class="col-span-12 lg:col-span-3 order-3 space-y-4 md:space-y-6">
             <div class="glass-card rounded-3xl p-5 border-t-2 border-emerald-500/20">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Elliott Wave</h3>
-                    <span class="text-[8px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 mono">D1 CYCLE</span>
+                    <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Estrutura de Tendência</h3>
+                    <span id="trend-badge" class="text-[8px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 mono">--</span>
                 </div>
+                <p class="text-[9px] text-slate-500 mb-2 leading-snug">
+                    Últimos 30 fechamentos (1h), reais. Não é contagem de Elliott Wave —
+                    isso não dá pra automatizar com confiabilidade, então trocamos por algo verificável.
+                </p>
                 <div class="h-32 md:h-40 w-full relative bg-black/30 rounded-2xl p-4 overflow-visible">
                     <svg viewBox="0 0 240 120" class="w-full h-full overflow-visible font-bold">
                         <defs>
@@ -246,26 +241,14 @@
                                 <stop offset="100%" style="stop-color:#ef4444;stop-opacity:1" />
                             </linearGradient>
                         </defs>
-                        <path d="M10,100 L45,45 L75,75 L125,20 L155,55 L195,15" fill="none" stroke="url(#waveGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="wave-path" />
-                        <path d="M195,15 L215,65 L235,105" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="wave-path" />
-                        
-                        <g fill="#10b981" font-size="9" class="mono">
-                            <circle cx="45" cy="45" r="5" fill="#05070a" stroke="#10b981" stroke-width="1"/>
-                            <text x="43" y="48">1</text>
-                            <circle cx="125" cy="20" r="5" fill="#05070a" stroke="#fbbf24" stroke-width="1"/>
-                            <text x="123" y="23" fill="#fbbf24">3</text>
-                        </g>
-
-                        <g>
-                            <circle cx="235" cy="105" r="6" fill="#ef4444" class="elliott-active-dot" />
-                            <text x="165" y="118" fill="#ef4444" font-size="10" font-weight="900" class="italic uppercase">Ⓒ CAPITULANDO</text>
-                        </g>
+                        <polyline id="trend-polyline" points="" fill="none" stroke="url(#waveGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="wave-path" />
                     </svg>
                 </div>
             </div>
 
             <div class="glass-card rounded-3xl p-6">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 text-center italic text-emerald-400">Terminal de Execução</h3>
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 text-center italic text-emerald-400">Terminal (sinal simulado)</h3>
+                <p class="text-[9px] text-slate-500 text-center mb-4">Não executa ordem real. Só registra a intenção.</p>
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="handleOrder('LONG')" class="btn-neural bg-emerald-600 py-4 rounded-xl text-white font-black text-[11px] shadow-[0_0_15px_rgba(16,185,129,0.3)]">BUY</button>
                     <button onclick="handleOrder('SHORT')" class="btn-neural bg-red-600 py-4 rounded-xl text-white font-black text-[11px] shadow-[0_0_15px_rgba(239,68,68,0.3)]">SELL</button>
@@ -273,16 +256,48 @@
             </div>
 
             <div class="glass-card rounded-3xl p-6 hidden md:block">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase mb-4 italic">Liquid. Recentes</h3>
-                <div id="liq-stream" class="liq-stream"></div>
+                <h3 class="text-[10px] font-black text-slate-500 uppercase mb-4 italic">Liquid. Reais (Futuros BTC, Binance)</h3>
+                <div id="liq-stream" class="liq-stream">
+                    <div class="text-[10px] text-slate-600 italic">Aguardando eventos…</div>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
+        // =====================================================================
+        // CHANGELOG (correções em relação à versão anterior)
+        // 1. RSI, MAs, F&G, Fibo, Elliott Wave e liquidações eram fake
+        //    (Math.random() ou valores fixos no HTML/CSS). Agora vêm de
+        //    cálculo real ou API pública real.
+        // 2. Preço via WebSocket da Binance já era real — mantido sem mudança.
+        // 3. Elliott Wave (subjetivo, não dá pra automatizar com confiança)
+        //    foi substituído por "Estrutura de Tendência": desenha os
+        //    últimos preços de verdade e classifica Alta/Baixa/Lateral
+        //    comparando MA8 x MA21 x MA100 reais.
+        // 4. Botões BUY/SELL agora deixam explícito que é só registro de
+        //    sinal, não execução real de ordem.
+        //
+        // FONTES USADAS (todas públicas, sem chave de API):
+        // - Preço/ticker: wss://stream.binance.com (Binance WebSocket)
+        // - Candles/indicadores: https://api.binance.com/api/v3/klines
+        // - Liquidações reais: wss://fstream.binance.com/ws/!forceOrder@arr
+        // - Fear & Greed: https://api.alternative.me/fng/
+        //
+        // LIMITAÇÃO HONESTA: nenhum indicador aqui prevê o futuro. RSI,
+        // médias e Fibo são reativos (leem preço passado). Nenhum sistema
+        // técnico crava com certeza quando vai haver topo, fundo, ou quantos
+        // candles de uma cor virão. Use como leitura de contexto, não como
+        // sinal automático de entrada.
+        // =====================================================================
+
+        const SYMBOL = "BTCUSDT";
+        const BINANCE_REST = "https://api.binance.com/api/v3";
+        const FNG_API = "https://api.alternative.me/fng/?limit=1";
+
         const state = {
             btcPrice: 0,
-            fibSupport: 51200,
+            klines: [],
             tickerData: { "BTC": { p: 0, c: 0 }, "ETH": { p: 0, c: 0 }, "SOL": { p: 0, c: 0 } }
         };
 
@@ -292,18 +307,239 @@
             ticker: document.getElementById('ticker-content'),
             rsi: document.getElementById('rsi-val'),
             distSupport: document.getElementById('dist-support'),
+            vol: document.getElementById('vol-val'),
+            flow: document.getElementById('flow-val'),
+            connStatus: document.getElementById('conn-status'),
+            trendBadge: document.getElementById('trend-badge'),
+            trendPolyline: document.getElementById('trend-polyline'),
             maValues: { ma8: document.getElementById('ma8-val'), ma21: document.getElementById('ma21-val'), ma100: document.getElementById('ma100-val'), ma200: document.getElementById('ma200-val') },
             maBars: { ma8: document.getElementById('ma8-bar'), ma21: document.getElementById('ma21-bar'), ma100: document.getElementById('ma100-bar'), ma200: document.getElementById('ma200-bar') }
         };
 
-        function updateMAs(price) {
-            const vals = { ma8: price * 0.99, ma21: price * 0.98, ma100: price * 0.94, ma200: price * 0.89 };
-            Object.keys(vals).forEach(k => {
-                if(elements.maValues[k]) elements.maValues[k].textContent = `$${vals[k].toLocaleString(undefined, {maximumFractionDigits:0})}`;
-                if(elements.maBars[k]) elements.maBars[k].style.width = `${40 + Math.random() * 50}%`;
+        // ---------------- Indicadores reais ----------------
+        function sma(closes, period) {
+            if (closes.length < period) return null;
+            const slice = closes.slice(-period);
+            return slice.reduce((a, b) => a + b, 0) / period;
+        }
+
+        function wilderRSI(closes, period = 14) {
+            if (closes.length < period + 1) return null;
+            let gains = 0, losses = 0;
+            for (let i = 1; i <= period; i++) {
+                const diff = closes[i] - closes[i - 1];
+                if (diff >= 0) gains += diff; else losses -= diff;
+            }
+            let avgGain = gains / period, avgLoss = losses / period;
+            for (let i = period + 1; i < closes.length; i++) {
+                const diff = closes[i] - closes[i - 1];
+                const gain = diff > 0 ? diff : 0, loss = diff < 0 ? -diff : 0;
+                avgGain = (avgGain * (period - 1) + gain) / period;
+                avgLoss = (avgLoss * (period - 1) + loss) / period;
+            }
+            if (avgLoss === 0) return 100;
+            const rs = avgGain / avgLoss;
+            return 100 - (100 / (1 + rs));
+        }
+
+        function realizedVolatility(closes, period = 20) {
+            if (closes.length < period + 1) return null;
+            const rets = [];
+            for (let i = closes.length - period; i < closes.length; i++) {
+                rets.push((closes[i] - closes[i - 1]) / closes[i - 1]);
+            }
+            const mean = rets.reduce((a, b) => a + b, 0) / rets.length;
+            const variance = rets.reduce((a, b) => a + (b - mean) ** 2, 0) / rets.length;
+            return Math.sqrt(variance) * 100; // % de desvio padrão por candle
+        }
+
+        function classifyVolatility(volPct) {
+            if (volPct === null) return "--";
+            if (volPct < 0.3) return "BAIXA";
+            if (volPct < 0.6) return "MÉDIA";
+            if (volPct < 1.0) return "ALTA";
+            return "CRÍTICA";
+        }
+
+        function fibLevels(klinesSlice) {
+            const highs = klinesSlice.map(k => k.high);
+            const lows = klinesSlice.map(k => k.low);
+            const swingHigh = Math.max(...highs);
+            const swingLow = Math.min(...lows);
+            const diff = swingHigh - swingLow;
+            return { swingHigh, swingLow, fib618: swingHigh - diff * 0.618 };
+        }
+
+        function updateMAsReal(mas, price) {
+            const entries = [["ma8", mas.ma8], ["ma21", mas.ma21], ["ma100", mas.ma100], ["ma200", mas.ma200]];
+            entries.forEach(([key, val]) => {
+                if (val === null || !price) return;
+                elements.maValues[key].textContent = `$${val.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+                // largura da barra reflete a distância real do preço em relação à média (visual, não decorativo aleatório)
+                const distPct = ((price - val) / val) * 100;
+                const width = Math.min(95, Math.max(5, 50 + distPct * 8));
+                elements.maBars[key].style.width = `${width}%`;
             });
         }
 
+        function updateTrendStructure(closes) {
+            const last30 = closes.slice(-30);
+            if (last30.length < 2) return;
+            const min = Math.min(...last30), max = Math.max(...last30);
+            const range = max - min || 1;
+            const points = last30.map((c, i) => {
+                const x = (i / (last30.length - 1)) * 240;
+                const y = 110 - ((c - min) / range) * 100;
+                return `${x.toFixed(1)},${y.toFixed(1)}`;
+            }).join(" ");
+            elements.trendPolyline.setAttribute("points", points);
+
+            const ma8 = sma(closes, 8), ma21 = sma(closes, 21), ma100 = sma(closes, 100);
+            let label = "LATERAL";
+            if (ma8 && ma21 && ma100) {
+                if (ma8 > ma21 && ma21 > ma100) label = "ALTA";
+                else if (ma8 < ma21 && ma21 < ma100) label = "BAIXA";
+            }
+            elements.trendBadge.textContent = label;
+        }
+
+        async function refreshIndicators() {
+            try {
+                const res = await fetch(`${BINANCE_REST}/klines?symbol=${SYMBOL}&interval=1h&limit=300`);
+                const raw = await res.json();
+                const klines = raw.map(k => ({ time: k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[5], takerBuyBase: +k[9] }));
+                state.klines = klines;
+                const closes = klines.map(k => k.close);
+
+                const mas = { ma8: sma(closes, 8), ma21: sma(closes, 21), ma100: sma(closes, 100), ma200: sma(closes, 200) };
+                const rsi = wilderRSI(closes, 14);
+                const vol = realizedVolatility(closes, 20);
+                const fib = fibLevels(klines.slice(-90));
+
+                const price = state.btcPrice || closes[closes.length - 1];
+                updateMAsReal(mas, price);
+                updateTrendStructure(closes);
+
+                elements.rsi.textContent = rsi !== null ? rsi.toFixed(0) : "--";
+                const distPct = ((price - fib.fib618) / price) * 100;
+                elements.distSupport.textContent = isFinite(distPct) ? `${distPct.toFixed(1)}%` : "--%";
+                elements.vol.textContent = classifyVolatility(vol);
+
+                const last20 = klines.slice(-20);
+                const totalVol = last20.reduce((a, k) => a + k.volume, 0);
+                const takerBuyVol = last20.reduce((a, k) => a + k.takerBuyBase, 0);
+                const buyRatio = totalVol > 0 ? (takerBuyVol / totalVol) * 100 : 50;
+                elements.flow.textContent = buyRatio >= 50 ? `COMPRA ${buyRatio.toFixed(0)}%` : `VENDA ${(100 - buyRatio).toFixed(0)}%`;
+            } catch (e) {
+                console.error("Erro ao buscar klines/indicadores da Binance:", e);
+            }
+        }
+
+        async function refreshFearGreed() {
+            try {
+                const res = await fetch(FNG_API);
+                const data = await res.json();
+                const value = parseInt(data.data[0].value, 10);
+                const classification = data.data[0].value_classification;
+                const map = {
+                    "Extreme Fear": "Medo Extremo", "Fear": "Medo", "Neutral": "Neutro",
+                    "Greed": "Ganância", "Extreme Greed": "Ganância Extrema"
+                };
+                document.getElementById('fg-value').textContent = value;
+                const fgText = document.getElementById('fg-text');
+                fgText.textContent = map[classification] || classification;
+                fgText.className = "text-[10px] font-bold uppercase tracking-widest mt-1 " + (value <= 25 ? "text-red-500" : value >= 75 ? "text-emerald-500" : "text-yellow-500");
+                const angle = -90 + (value / 100) * 180;
+                document.getElementById('gauge-needle-group').style.transform = `rotate(${angle}deg)`;
+            } catch (e) {
+                console.error("Erro ao buscar Fear & Greed:", e);
+            }
+        }
+
+        // ---------------- Gráfico de candles ao vivo (canvas, direto do stream de klines da Binance) ----------------
+        const chartState = { candles: [] }; // últimos ~90 candles de 1 minuto
+        const chartCanvas = document.getElementById('liveChart');
+        const chartStatusDot = document.getElementById('chart-status-dot');
+        const chartStatusText = document.getElementById('chart-status-text');
+
+        function drawLiveChart() {
+            if (!chartCanvas || chartState.candles.length === 0) return;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = chartCanvas.getBoundingClientRect();
+            chartCanvas.width = rect.width * dpr;
+            chartCanvas.height = rect.height * dpr;
+            const ctx = chartCanvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, rect.width, rect.height);
+
+            const candles = chartState.candles;
+            const highs = candles.map(c => c.high), lows = candles.map(c => c.low);
+            const max = Math.max(...highs), min = Math.min(...lows);
+            const pad = (max - min) * 0.08 || 1;
+            const domainMax = max + pad, domainMin = min - pad;
+            const candleW = rect.width / candles.length;
+            const y = v => rect.height - ((v - domainMin) / (domainMax - domainMin)) * rect.height;
+
+            candles.forEach((c, i) => {
+                const bullish = c.close >= c.open;
+                ctx.strokeStyle = ctx.fillStyle = bullish ? "#10b981" : "#ef4444";
+                const x = i * candleW + candleW / 2;
+                ctx.beginPath();
+                ctx.moveTo(x, y(c.high)); ctx.lineTo(x, y(c.low));
+                ctx.lineWidth = 1; ctx.stroke();
+                const bodyTop = y(Math.max(c.open, c.close));
+                const bodyBottom = y(Math.min(c.open, c.close));
+                ctx.fillRect(x - candleW * 0.32, bodyTop, candleW * 0.64, Math.max(1, bodyBottom - bodyTop));
+            });
+        }
+
+        async function seedChartHistory() {
+            try {
+                const res = await fetch(`${BINANCE_REST}/klines?symbol=${SYMBOL}&interval=1m&limit=90`);
+                const raw = await res.json();
+                chartState.candles = raw.map(k => ({ open: +k[1], high: +k[2], low: +k[3], close: +k[4] }));
+                drawLiveChart();
+            } catch (e) {
+                console.error("Erro ao carregar histórico do gráfico:", e);
+            }
+        }
+
+        function initKlineStream() {
+            try {
+                const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${SYMBOL.toLowerCase()}@kline_1m`);
+                ws.onopen = () => {
+                    chartStatusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                    chartStatusText.textContent = "Feed Neural · ao vivo";
+                };
+                ws.onerror = () => {
+                    chartStatusDot.className = "w-2 h-2 rounded-full bg-red-500";
+                    chartStatusText.textContent = "Feed Neural · sem conexão";
+                };
+                ws.onmessage = (e) => {
+                    const msg = JSON.parse(e.data);
+                    const k = msg.k;
+                    const candle = { open: +k.o, high: +k.h, low: +k.l, close: +k.c };
+                    const candles = chartState.candles;
+                    if (candles.length === 0) { candles.push(candle); }
+                    else if (k.x) {
+                        // candle fechou: substitui o último (que era o candle em formação) e abre espaço pro próximo
+                        candles[candles.length - 1] = candle;
+                        candles.push(candle);
+                        if (candles.length > 90) candles.shift();
+                    } else {
+                        // candle em formação: só atualiza o último
+                        candles[candles.length - 1] = candle;
+                    }
+                    drawLiveChart();
+                };
+            } catch (e) {
+                console.error("Não foi possível abrir stream de klines:", e);
+            }
+        }
+
+        window.addEventListener('resize', drawLiveChart);
+
+        // ---------------- Ticker / preço ao vivo (real, mantido) ----------------
         function renderTicker() {
             const content = Object.entries(state.tickerData).map(([s, d]) => {
                 const isPos = d.c >= 0;
@@ -312,47 +548,72 @@
             elements.ticker.innerHTML = content + content;
         }
 
-        function pushLiquidation() {
-            const isLong = Math.random() > 0.4;
+        // ---------------- Liquidações reais (futuros Binance) ----------------
+        function pushLiquidationReal(order) {
+            const isLongLiquidated = order.S === "SELL"; // ordem de venda forçada = estava comprado (long)
             const item = document.createElement('div');
-            item.className = `liq-item flex justify-between ${isLong ? 'text-red-400' : 'text-emerald-400'}`;
-            item.innerHTML = `<span>BTC ${isLong ? 'LONG' : 'SHORT'}</span><span class="font-bold">$${(Math.random() * 800).toFixed(1)}K</span>`;
+            item.className = `liq-item flex justify-between ${isLongLiquidated ? 'text-red-400' : 'text-emerald-400'}`;
+            const usdValue = parseFloat(order.q) * parseFloat(order.p);
+            item.innerHTML = `<span>${order.s} ${isLongLiquidated ? 'LONG' : 'SHORT'}</span><span class="font-bold">$${(usdValue / 1000).toFixed(1)}K</span>`;
             const container = document.getElementById('liq-stream');
-            if(!container) return;
+            if (!container) return;
+            if (container.firstElementChild && container.firstElementChild.classList.contains('text-slate-600')) {
+                container.innerHTML = "";
+            }
             container.prepend(item);
-            if(container.children.length > 4) container.removeChild(container.lastChild);
+            if (container.children.length > 4) container.removeChild(container.lastChild);
+        }
+
+        function initLiquidationStream() {
+            try {
+                const ws = new WebSocket("wss://fstream.binance.com/ws/!forceOrder@arr");
+                ws.onmessage = (e) => {
+                    const msg = JSON.parse(e.data);
+                    const order = msg.o;
+                    if (!order || order.s !== SYMBOL) return; // só liquidações de BTC futuros
+                    pushLiquidationReal(order);
+                };
+                ws.onerror = () => console.error("WebSocket de liquidações falhou.");
+            } catch (e) {
+                console.error("Não foi possível abrir stream de liquidações:", e);
+            }
         }
 
         function handleOrder(type) {
             const t = document.getElementById('toast');
-            document.getElementById('toast-msg').textContent = `ORDEM ${type} EXECUTADA`;
+            document.getElementById('toast-msg').textContent = `SINAL ${type} REGISTRADO (SIMULADO)`;
             t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 2000);
+            setTimeout(() => t.classList.add('hidden'), 2500);
         }
 
         function initWebSocket() {
             const ws = new WebSocket(`wss://stream.binance.com:9443/ws/btcusdt@ticker/ethusdt@ticker/solusdt@ticker`);
+            ws.onopen = () => { elements.connStatus.textContent = "CÉREBRO ATIVO"; };
+            ws.onerror = () => { elements.connStatus.textContent = "ERRO DE CONEXÃO"; };
             ws.onmessage = (e) => {
                 const data = JSON.parse(e.data);
                 const sym = data.s.replace('USDT', '');
                 state.tickerData[sym] = { p: parseFloat(data.c), c: parseFloat(data.P) };
-                
+
                 if (sym === 'BTC') {
                     state.btcPrice = state.tickerData[sym].p;
-                    elements.price.textContent = `$${state.btcPrice.toLocaleString('en-US', {minimumFractionDigits:2})}`;
+                    elements.price.textContent = `$${state.btcPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
                     elements.pricePct.textContent = `${state.tickerData[sym].c >= 0 ? '+' : ''}${state.tickerData[sym].c.toFixed(2)}%`;
                     elements.pricePct.className = `text-[10px] md:text-sm font-black mono ${state.tickerData[sym].c >= 0 ? 'text-emerald-500' : 'text-red-500'}`;
-                    elements.rsi.textContent = Math.floor(15 + Math.random() * 15);
-                    elements.distSupport.textContent = `${(((state.btcPrice - state.fibSupport) / state.btcPrice) * 100).toFixed(1)}%`;
-                    updateMAs(state.btcPrice);
-                    if(Math.random() > 0.9) pushLiquidation();
                 }
                 renderTicker();
             };
         }
 
-        window.onload = initWebSocket;
+        window.onload = () => {
+            initWebSocket();
+            initLiquidationStream();
+            seedChartHistory().then(initKlineStream);
+            refreshFearGreed();
+            refreshIndicators();
+            setInterval(refreshIndicators, 60000); // klines/RSI/MAs a cada 60s
+            setInterval(refreshFearGreed, 5 * 60000); // F&G atualiza a cada 12h na fonte, sem necessidade de checar mais rápido que isso
+        };
     </script>
 </body>
 </html>
-
