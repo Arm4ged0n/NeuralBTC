@@ -125,11 +125,14 @@
                 </div>
             </div>
         </div>
-        <div class="flex flex-col items-end">
+        <div class="flex flex-col items-end gap-2">
             <div class="flex items-baseline gap-2 md:gap-3">
                 <p id="live-price-pct" class="text-[10px] md:text-sm font-black mono text-emerald-500">+0.00%</p>
                 <p id="live-price" class="text-lg md:text-3xl font-black tracking-tighter text-white tabular-nums">$ 0.00</p>
             </div>
+            <button onclick="generateAIReport()" class="btn-neural bg-black border border-emerald-500/40 text-emerald-400 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg hover:bg-emerald-500/10">
+                🧠 Análise
+            </button>
         </div>
     </nav>
 
@@ -262,6 +265,20 @@
                         <polyline id="trend-polyline" points="" fill="none" stroke="url(#waveGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="wave-path" />
                     </svg>
                 </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-5 border-t-2 border-emerald-500/20">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Sinal de Confluência</h3>
+                    <span class="text-[8px] bg-white/5 text-slate-500 px-2 py-0.5 rounded mono">mesma regra do backtest</span>
+                </div>
+                <p class="text-[9px] text-slate-500 mb-3 leading-snug">
+                    Probabilidade condicional testada historicamente — não é previsão de topo/fundo com antecedência garantida.
+                </p>
+                <div id="confluence-badge" class="text-center py-3 rounded-xl bg-white/5 mb-2">
+                    <span class="text-lg font-black text-slate-400">CARREGANDO…</span>
+                </div>
+                <p id="confluence-reason" class="text-[9px] text-slate-500 text-center leading-snug">--</p>
             </div>
 
             <div class="glass-card rounded-3xl p-6">
@@ -406,6 +423,19 @@
         const BINANCE_REST = "https://api.binance.com/api/v3";
         const FNG_API = "https://api.alternative.me/fng/?limit=1";
 
+        // Estado global com os últimos valores REAIS já calculados — usado pelo
+        // botão de análise e pelos alertas, pra não recalcular tudo de novo.
+        const liveState = {
+            price: null, priceChangePct: null,
+            rsi1h: null, rsi4h: null, rsi1d: null,
+            trendLabel: null,
+            volLabel: null,
+            fgValue: null, fgText: null,
+            distFibPct: null,
+            confluenceSignal: "NEUTRO", confluenceReason: "",
+            lastConfluenceSignal: "NEUTRO",
+        };
+
         const state = {
             btcPrice: 0,
             klines: [],
@@ -534,7 +564,12 @@
                 elements.rsi.textContent = rsi !== null ? rsi.toFixed(0) : "--";
                 const distPct = ((price - fib.fib618) / price) * 100;
                 elements.distSupport.textContent = isFinite(distPct) ? `${distPct.toFixed(1)}%` : "--%";
-                elements.vol.textContent = classifyVolatility(vol);
+                const volLabel = classifyVolatility(vol);
+                elements.vol.textContent = volLabel;
+                liveState.price = price;
+                liveState.distFibPct = isFinite(distPct) ? distPct : null;
+                liveState.volLabel = volLabel;
+                liveState.trendLabel = elements.trendBadge.textContent;
 
                 const last20 = klines.slice(-20);
                 const totalVol = last20.reduce((a, k) => a + k.volume, 0);
@@ -562,6 +597,8 @@
                 fgText.className = "text-[10px] font-bold uppercase tracking-widest mt-1 " + (value <= 25 ? "text-red-500" : value >= 75 ? "text-emerald-500" : "text-yellow-500");
                 const angle = -90 + (value / 100) * 180;
                 document.getElementById('gauge-needle-group').style.transform = `rotate(${angle}deg)`;
+                liveState.fgValue = value;
+                liveState.fgText = map[classification] || classification;
             } catch (e) {
                 console.error("Erro ao buscar Fear & Greed:", e);
             }
@@ -620,6 +657,7 @@
                     const closes = raw.map(k => +k[4]);
                     const rsi = wilderRSI(closes, 14);
                     document.getElementById(elId).textContent = rsi !== null ? rsi.toFixed(0) : "--";
+                    liveState[`rsi${tf}`] = rsi !== null ? rsi.toFixed(0) : null;
                 } catch (e) {
                     console.error(`Erro RSI ${tf}:`, e);
                 }
@@ -792,6 +830,8 @@
                     elements.price.textContent = `$${state.btcPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
                     elements.pricePct.textContent = `${state.tickerData[sym].c >= 0 ? '+' : ''}${state.tickerData[sym].c.toFixed(2)}%`;
                     elements.pricePct.className = `text-[10px] md:text-sm font-black mono ${state.tickerData[sym].c >= 0 ? 'text-emerald-500' : 'text-red-500'}`;
+                    liveState.price = state.btcPrice;
+                    liveState.priceChangePct = state.tickerData[sym].c;
                 }
                 renderTicker();
             };
@@ -806,12 +846,158 @@
             refreshMultiTimeframeRSI();
             refreshTopCrypto();
             refreshGlobalIndices();
+            refreshConfluenceSignal();
             setInterval(refreshIndicators, 60000);
             setInterval(refreshMultiTimeframeRSI, 90000);
             setInterval(refreshTopCrypto, 90000);
             setInterval(refreshGlobalIndices, 60000);
+            setInterval(refreshConfluenceSignal, 60000);
             setInterval(refreshFearGreed, 5 * 60000);
         };
+        // ---------------- Sinal de Confluência (mesma regra do confluence_engine.py) ----------------
+        // LONG:  RSI(15m)<30, RSI(1h)>20, tendência 1h != BAIXA, volume>1.2x média(20), preço>MA100(15m)
+        // SHORT: espelho exato invertido
+        // Isto é probabilidade condicional testada no backtest, não previsão de topo/fundo.
+        async function refreshConfluenceSignal() {
+            const badge = document.getElementById('confluence-badge');
+            const reasonEl = document.getElementById('confluence-reason');
+            try {
+                const [res15, res1h] = await Promise.all([
+                    fetch(`${BINANCE_REST}/klines?symbol=${SYMBOL}&interval=15m&limit=110`),
+                    fetch(`${BINANCE_REST}/klines?symbol=${SYMBOL}&interval=1h&limit=30`),
+                ]);
+                const raw15 = await res15.json();
+                const raw1h = await res1h.json();
+
+                const closes15 = raw15.map(k => +k[4]);
+                const volumes15 = raw15.map(k => +k[5]);
+                const closes1h = raw1h.map(k => +k[4]);
+
+                const rsi15 = wilderRSI(closes15, 14);
+                const rsi1h = wilderRSI(closes1h, 14);
+                const ma100_15 = sma(closes15, 100);
+                const ma8_1h = sma(closes1h, 8);
+                const ma21_1h = sma(closes1h, 21);
+                const avgVol20 = volumes15.slice(-20).reduce((a, b) => a + b, 0) / 20;
+                const lastVol = volumes15[volumes15.length - 1];
+                const lastClose = closes15[closes15.length - 1];
+
+                const trendHtf = (ma8_1h && ma21_1h) ? (ma8_1h > ma21_1h ? "ALTA" : ma8_1h < ma21_1h ? "BAIXA" : "LATERAL") : "--";
+                const volOk = lastVol > avgVol20 * 1.2;
+
+                const longCond = rsi15 < 30 && rsi1h > 20 && trendHtf !== "BAIXA" && volOk && ma100_15 && lastClose > ma100_15;
+                const shortCond = rsi15 > 70 && rsi1h < 80 && trendHtf !== "ALTA" && volOk && ma100_15 && lastClose < ma100_15;
+
+                if (longCond) {
+                    badge.innerHTML = '<span class="text-lg font-black text-emerald-400">LONG (confluência)</span>';
+                    badge.className = "text-center py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 mb-2";
+                    const reason = `RSI15m ${rsi15.toFixed(0)} sobrevenda + RSI1h ${rsi1h.toFixed(0)} + tendência 1h ${trendHtf} + volume confirmando`;
+                    reasonEl.textContent = reason;
+                    liveState.confluenceSignal = "LONG";
+                    liveState.confluenceReason = reason;
+                } else if (shortCond) {
+                    badge.innerHTML = '<span class="text-lg font-black text-red-400">SHORT (confluência)</span>';
+                    badge.className = "text-center py-3 rounded-xl bg-red-500/10 border border-red-500/30 mb-2";
+                    const reason = `RSI15m ${rsi15.toFixed(0)} sobrecompra + RSI1h ${rsi1h.toFixed(0)} + tendência 1h ${trendHtf} + volume confirmando`;
+                    reasonEl.textContent = reason;
+                    liveState.confluenceSignal = "SHORT";
+                    liveState.confluenceReason = reason;
+                } else {
+                    badge.innerHTML = '<span class="text-lg font-black text-slate-400">NEUTRO</span>';
+                    badge.className = "text-center py-3 rounded-xl bg-white/5 mb-2";
+                    const reason = `RSI15m ${rsi15.toFixed(0)} · RSI1h ${rsi1h.toFixed(0)} · tendência 1h ${trendHtf} — sem confluência completa`;
+                    reasonEl.textContent = reason;
+                    liveState.confluenceSignal = "NEUTRO";
+                    liveState.confluenceReason = reason;
+                }
+
+                // Alerta só dispara na TRANSIÇÃO (evita spam de notificação a cada 60s)
+                if (liveState.confluenceSignal !== liveState.lastConfluenceSignal && liveState.confluenceSignal !== "NEUTRO") {
+                    triggerTopBottomAlert(liveState.confluenceSignal, liveState.confluenceReason);
+                }
+                liveState.lastConfluenceSignal = liveState.confluenceSignal;
+            } catch (e) {
+                console.error("Erro ao calcular sinal de confluência:", e);
+                badge.innerHTML = '<span class="text-lg font-black text-yellow-500">SEM DADO</span>';
+                reasonEl.textContent = "Falha ao buscar klines para o cálculo.";
+            }
+        }
+
+        // ---------------- Alertas de topo/fundo (transição de sinal) ----------------
+        if ("Notification" in window && Notification.permission === "default") {
+            // Pede permissão só uma vez, sem travar o carregamento da página
+            setTimeout(() => Notification.requestPermission(), 3000);
+        }
+
+        function triggerTopBottomAlert(signal, reason) {
+            const isLong = signal === "LONG";
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = `${isLong ? '🟢 POSSÍVEL FUNDO' : '🔴 POSSÍVEL TOPO'} — ${signal}`;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 4000);
+
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(`Neural Trader BTC — ${isLong ? 'Possível Fundo' : 'Possível Topo'}`, {
+                    body: reason,
+                });
+            }
+        }
+
+        // ---------------- Botão de Análise (terminal DOS, texto determinístico) ----------------
+        function generateAIReport() {
+            const s = liveState;
+            const now = new Date().toLocaleString('pt-BR');
+            const lines = [
+                `NEURAL TRADER BTC — RELATÓRIO DE LEITURA (${now})`,
+                `${'='.repeat(58)}`,
+                ``,
+                `[GERADO POR REGRAS, NÃO POR MODELO DE LINGUAGEM]`,
+                `Isto NÃO é análise de IA generativa — é a síntese em texto`,
+                `dos indicadores reais já calculados nesta tela.`,
+                ``,
+                `--- RESUMO ---`,
+                `Preço atual: $${s.price ? s.price.toLocaleString('en-US', {minimumFractionDigits:2}) : '--'} (${s.priceChangePct >= 0 ? '+' : ''}${s.priceChangePct?.toFixed(2) ?? '--'}%)`,
+                `Sinal de confluência: ${s.confluenceSignal}`,
+                `Motivo: ${s.confluenceReason || '--'}`,
+                ``,
+                `--- INDICADORES ---`,
+                `RSI 1h:  ${s.rsi1h ?? '--'}`,
+                `RSI 4h:  ${s.rsi4h ?? '--'}`,
+                `RSI 1d:  ${s.rsi1d ?? '--'}`,
+                `Tendência (estrutura MA8x21x100): ${s.trendLabel ?? '--'}`,
+                `Volatilidade: ${s.volLabel ?? '--'}`,
+                `Distância do suporte Fibo 61.8%: ${s.distFibPct !== null ? s.distFibPct.toFixed(1)+'%' : '--'}`,
+                `Fear & Greed: ${s.fgValue ?? '--'} (${s.fgText ?? '--'})`,
+                ``,
+                `--- CONTRAPONTO (obrigatório) ---`,
+                s.confluenceSignal === "LONG"
+                  ? `O que invalida esta leitura: se o RSI 1h virar abaixo de 20 ou a`
+                  : s.confluenceSignal === "SHORT"
+                  ? `O que invalida esta leitura: se o RSI 1h subir acima de 80 ou a`
+                  : `Sem sinal ativo — não há tese para invalidar no momento.`,
+                s.confluenceSignal !== "NEUTRO"
+                  ? `tendência 1h reverter, a confluência se desfaz e o sinal deve`
+                  : ``,
+                s.confluenceSignal !== "NEUTRO" ? `ser tratado como inválido, mesmo que o preço ainda não tenha` : ``,
+                s.confluenceSignal !== "NEUTRO" ? `se movido.` : ``,
+                ``,
+                `--- LEMBRETE DE GESTÃO DE RISCO (fixo, não muda) ---`,
+                `Risco travado: 1-2% do capital por operação.`,
+                `Isto é probabilidade condicional testada, não previsão`,
+                `com antecedência garantida de topo/fundo.`,
+                ``,
+                `${'='.repeat(58)}`,
+                `Análise estratégica/educacional. Não é recomendação de`,
+                `investimento. Decisão e gestão de capital são suas.`,
+            ];
+            document.getElementById('dosOutput').textContent = lines.filter(l => l !== undefined).join('\n');
+            document.getElementById('dosModal').classList.remove('hidden');
+        }
+
+        function closeDosModal() {
+            document.getElementById('dosModal').classList.add('hidden');
+        }
+
         // ---------------- Abas (Ao Vivo / Backtest) ----------------
         function switchTab(tab) {
             const liveTab = document.getElementById('tab-live');
