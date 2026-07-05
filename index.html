@@ -133,7 +133,12 @@
         </div>
     </nav>
 
-    <main class="flex-1 p-4 md:p-8 grid grid-cols-12 gap-4 md:gap-6 max-w-[1700px] mx-auto w-full">
+    <div class="flex gap-2 px-4 md:px-8 pt-4 max-w-[1700px] mx-auto w-full">
+        <button id="tabBtnLive" onclick="switchTab('live')" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white">📡 Ao Vivo</button>
+        <button id="tabBtnBacktest" onclick="switchTab('backtest')" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400">📊 Backtest</button>
+    </div>
+
+    <main id="tab-live" class="flex-1 p-4 md:p-8 grid grid-cols-12 gap-4 md:gap-6 max-w-[1700px] mx-auto w-full">
 
         <!-- COLUNA 1: PSICOLOGIA E MÉDIAS -->
         <div class="col-span-12 lg:col-span-3 order-2 lg:order-1 space-y-4 md:y-6">
@@ -309,6 +314,66 @@
             </div>
         </div>
     </main>
+
+    <section id="tab-backtest" class="hidden flex-1 p-4 md:p-8 max-w-[1700px] mx-auto w-full space-y-4 md:space-y-6">
+        <div class="glass-card rounded-2xl p-4 text-[11px] text-yellow-500 border border-yellow-500/20 bg-yellow-500/5">
+            ⚠️ Resultado histórico simulado, não é garantia de resultado futuro. Ver limitações no fim desta aba.
+        </div>
+
+        <label class="glass-card rounded-3xl p-8 flex flex-col items-center justify-center gap-2 border-2 border-dashed border-white/10 cursor-pointer hover:border-emerald-500/40" id="btUploadBox">
+            <input type="file" id="btFileInput" accept=".json" class="hidden" />
+            <span class="text-2xl">📂</span>
+            <span id="btUploadText" class="text-[11px] text-slate-400">Clique ou arraste o <b class="text-white">backtest_results.json</b> aqui</span>
+        </label>
+
+        <div id="btContent" class="hidden space-y-4 md:space-y-6">
+            <div class="glass-card rounded-2xl p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div><div class="text-[9px] text-slate-500 uppercase">Símbolo</div><div id="bt-symbol" class="mono font-black">--</div></div>
+                <div><div class="text-[9px] text-slate-500 uppercase">Período</div><div id="bt-period" class="mono font-black">--</div></div>
+                <div><div class="text-[9px] text-slate-500 uppercase">Sinais</div><div id="bt-signals" class="mono font-black">--</div></div>
+                <div><div class="text-[9px] text-slate-500 uppercase">Gerado em</div><div id="bt-date" class="mono text-[11px]">--</div></div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4 italic">Comparação por Tamanho de Posição</h3>
+                <div class="overflow-x-auto">
+                <table class="w-full text-[11px]">
+                    <thead class="text-slate-500 uppercase text-[9px]">
+                        <tr><th class="text-left py-2">Risco</th><th class="text-left">Trades</th><th class="text-left">Win Rate</th><th class="text-left">Expectativa</th><th class="text-left">Max DD</th><th class="text-left">Retorno</th></tr>
+                    </thead>
+                    <tbody id="bt-metrics-table"></tbody>
+                </table>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-3 italic">Curva de Capital</h3>
+                <canvas id="btEquityChart" height="260"></canvas>
+                <div class="flex gap-4 text-[10px] mt-2 mono">
+                    <span class="text-emerald-500">■ 1%</span>
+                    <span class="text-yellow-500">■ 2%</span>
+                    <span class="text-red-500">■ 5%</span>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-3 italic">Últimos Trades (risco 1%)</h3>
+                <div class="overflow-x-auto">
+                <table class="w-full text-[11px]">
+                    <thead class="text-slate-500 uppercase text-[9px]"><tr><th class="text-left py-2">Tipo</th><th class="text-left">Entrada</th><th class="text-left">Saída</th><th class="text-left">P&L</th></tr></thead>
+                    <tbody id="bt-trades-table"></tbody>
+                </table>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 text-[10px] text-slate-500 leading-relaxed">
+                <b class="text-yellow-500">⚠️ Limitações:</b> resultado simulado com taxa incluída, sem slippage real.
+                Regras fixas de confluência (RSI 15m/1h + volume + estrutura de tendência) não foram otimizadas
+                neste período específico (evita overfitting), mas também não passaram por validação walk-forward.
+                Rode em mais de um período antes de confiar no número.
+            </div>
+        </div>
+    </section>
 
     <script>
         // =====================================================================
@@ -747,6 +812,123 @@
             setInterval(refreshGlobalIndices, 60000);
             setInterval(refreshFearGreed, 5 * 60000);
         };
+        // ---------------- Abas (Ao Vivo / Backtest) ----------------
+        function switchTab(tab) {
+            const liveTab = document.getElementById('tab-live');
+            const btTab = document.getElementById('tab-backtest');
+            const btnLive = document.getElementById('tabBtnLive');
+            const btnBt = document.getElementById('tabBtnBacktest');
+            if (tab === 'live') {
+                liveTab.classList.remove('hidden');
+                btTab.classList.add('hidden');
+                btnLive.className = "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white";
+                btnBt.className = "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400";
+            } else {
+                liveTab.classList.add('hidden');
+                btTab.classList.remove('hidden');
+                btnBt.className = "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white";
+                btnLive.className = "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400";
+            }
+        }
+
+        // ---------------- Aba Backtest: carregar e renderizar backtest_results.json ----------------
+        const btUploadBox = document.getElementById('btUploadBox');
+        const btFileInput = document.getElementById('btFileInput');
+
+        btUploadBox.addEventListener('dragover', (e) => { e.preventDefault(); btUploadBox.classList.add('border-emerald-500/40'); });
+        btUploadBox.addEventListener('dragleave', () => { btUploadBox.classList.remove('border-emerald-500/40'); });
+        btUploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (e.dataTransfer.files.length) loadBacktestFile(e.dataTransfer.files[0]);
+        });
+        btFileInput.addEventListener('change', (e) => { if (e.target.files.length) loadBacktestFile(e.target.files[0]); });
+
+        function loadBacktestFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    renderBacktest(JSON.parse(e.target.result));
+                } catch (err) {
+                    alert('Arquivo inválido: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function renderBacktest(data) {
+            document.getElementById('btContent').classList.remove('hidden');
+            document.getElementById('btUploadText').innerHTML = '✅ Carregado — clique para trocar o arquivo';
+
+            document.getElementById('bt-symbol').textContent = data.symbol || '--';
+            document.getElementById('bt-period').textContent = `${data.months_back || '--'} meses`;
+            document.getElementById('bt-signals').textContent = `${data.signals_summary?.long ?? 0}L / ${data.signals_summary?.short ?? 0}S`;
+            document.getElementById('bt-date').textContent = data.generated_at ? new Date(data.generated_at).toLocaleString('pt-BR') : '--';
+
+            const tbody = document.getElementById('bt-metrics-table');
+            tbody.innerHTML = (data.risk_levels || []).map(lvl => {
+                if (!lvl.metrics) {
+                    return `<tr class="border-t border-white/5"><td class="py-1.5 mono">${(lvl.risk_pct*100).toFixed(0)}%</td><td colspan="5" class="text-slate-500">nenhum trade gerado</td></tr>`;
+                }
+                const m = lvl.metrics;
+                const retClass = m.total_return_pct >= 0 ? 'text-emerald-400' : 'text-red-400';
+                return `<tr class="border-t border-white/5">
+                    <td class="py-1.5 mono">${(lvl.risk_pct*100).toFixed(0)}%</td>
+                    <td class="mono">${m.num_trades}</td>
+                    <td class="mono">${m.win_rate_pct}%</td>
+                    <td class="mono">$${m.expectancy_per_trade}</td>
+                    <td class="mono text-red-400">${m.max_drawdown_pct}%</td>
+                    <td class="mono ${retClass}">${m.total_return_pct}%</td>
+                </tr>`;
+            }).join('');
+
+            drawBtEquityChart(data.risk_levels || []);
+
+            const firstLevel = (data.risk_levels || []).find(l => l.trades && l.trades.length);
+            const tradesBody = document.getElementById('bt-trades-table');
+            tradesBody.innerHTML = firstLevel
+                ? firstLevel.trades.slice(-20).reverse().map(t => {
+                    const pnlClass = t.pnl >= 0 ? 'text-emerald-400' : 'text-red-400';
+                    return `<tr class="border-t border-white/5">
+                        <td class="py-1.5">${t.type}</td>
+                        <td class="mono">$${Number(t.entry).toFixed(2)}</td>
+                        <td class="mono">$${Number(t.exit).toFixed(2)}</td>
+                        <td class="mono ${pnlClass}">$${Number(t.pnl).toFixed(2)}</td>
+                    </tr>`;
+                }).join('')
+                : '<tr><td colspan="4" class="text-slate-500 py-2">Sem trades registrados.</td></tr>';
+        }
+
+        function drawBtEquityChart(riskLevels) {
+            const canvas = document.getElementById('btEquityChart');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = 260 * dpr;
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, rect.width, 260);
+
+            const colors = { 0.01: '#10b981', 0.02: '#eab308', 0.05: '#ef4444' };
+            const allValues = riskLevels.flatMap(l => l.equity_curve || []);
+            if (allValues.length === 0) return;
+            const max = Math.max(...allValues), min = Math.min(...allValues);
+            const pad = (max - min) * 0.1 || 1;
+            const domainMax = max + pad, domainMin = min - pad;
+
+            riskLevels.forEach(lvl => {
+                const curve = lvl.equity_curve || [];
+                if (curve.length < 2) return;
+                ctx.strokeStyle = colors[lvl.risk_pct] || '#888';
+                ctx.lineWidth = 1.8;
+                ctx.beginPath();
+                curve.forEach((v, i) => {
+                    const x = (i / (curve.length - 1)) * rect.width;
+                    const y = 260 - ((v - domainMin) / (domainMax - domainMin)) * 260;
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+            });
+        }
     </script>
 </body>
 </html>
