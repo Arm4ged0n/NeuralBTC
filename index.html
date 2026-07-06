@@ -1107,6 +1107,32 @@
         }
 
         // ---------------- Botão de Análise (terminal DOS, texto determinístico) ----------------
+        let typewriterTimer = null;
+
+        function typewriterEffect(el, text, speed = 12) {
+            if (typewriterTimer) clearInterval(typewriterTimer);
+            el.textContent = '';
+            let i = 0;
+            typewriterTimer = setInterval(() => {
+                i += 2;
+                if (i >= text.length) {
+                    el.textContent = text;
+                    clearInterval(typewriterTimer);
+                    typewriterTimer = null;
+                } else {
+                    el.textContent = text.slice(0, i) + '▊';
+                }
+            }, speed);
+        }
+
+        function skipTypewriter(fullText) {
+            if (typewriterTimer) {
+                clearInterval(typewriterTimer);
+                typewriterTimer = null;
+                document.getElementById('dosOutput').textContent = fullText;
+            }
+        }
+
         function generateAIReport() {
           try {
             console.log('[generateAIReport] botão clicado, iniciando...');
@@ -1155,14 +1181,28 @@
                 `Análise estratégica/educacional. Não é recomendação de`,
                 `investimento. Decisão e gestão de capital são suas.`,
             ];
+            const fullText = lines.filter(l => l !== undefined).join('\n');
             const outputEl = document.getElementById('dosOutput');
             const modalEl = document.getElementById('dosModal');
             if (!outputEl || !modalEl) {
                 throw new Error(`Elemento não encontrado: dosOutput=${!!outputEl}, dosModal=${!!modalEl}`);
             }
-            outputEl.textContent = lines.filter(l => l !== undefined).join('\n');
+
             modalEl.classList.remove('hidden');
-            console.log('[generateAIReport] modal aberto com sucesso');
+            outputEl.onclick = () => skipTypewriter(fullText);
+            outputEl.textContent = 'ANALISANDO DADOS EM TEMPO REAL...';
+            let dots = 0;
+            const thinkingTimer = setInterval(() => {
+                dots = (dots + 1) % 4;
+                outputEl.textContent = 'ANALISANDO DADOS EM TEMPO REAL' + '.'.repeat(dots);
+            }, 250);
+
+            setTimeout(() => {
+                clearInterval(thinkingTimer);
+                typewriterEffect(outputEl, fullText, 10);
+            }, 1100);
+
+            console.log('[generateAIReport] modal aberto, iniciando animação de escrita');
           } catch (err) {
             console.error('[generateAIReport] ERRO:', err);
             alert('Erro ao gerar análise (me manda esta mensagem): ' + err.message);
@@ -1170,6 +1210,7 @@
         }
 
         function closeDosModal() {
+            if (typewriterTimer) { clearInterval(typewriterTimer); typewriterTimer = null; }
             document.getElementById('dosModal').classList.add('hidden');
         }
 
