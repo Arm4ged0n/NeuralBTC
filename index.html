@@ -1138,48 +1138,67 @@
             console.log('[generateAIReport] botão clicado, iniciando...');
             const s = liveState;
             const now = new Date().toLocaleString('pt-BR');
+            const priceStr = s.price ? `$${s.price.toLocaleString('en-US', {minimumFractionDigits:2})}` : '--';
+            const pctStr = `${s.priceChangePct >= 0 ? '+' : ''}${s.priceChangePct?.toFixed(2) ?? '--'}%`;
+            const fibStr = s.distFibPct !== null && s.distFibPct !== undefined ? s.distFibPct.toFixed(1)+'%' : '--';
+
             const lines = [
-                `NEURAL TRADER BTC — RELATÓRIO DE LEITURA (${now})`,
+                `NEURAL TRADER BTC — RELATÓRIO OPERACIONAL (${now})`,
                 `${'='.repeat(58)}`,
-                ``,
                 `[GERADO POR REGRAS, NÃO POR MODELO DE LINGUAGEM]`,
-                `Isto NÃO é análise de IA generativa — é a síntese em texto`,
-                `dos indicadores reais já calculados nesta tela.`,
+                `Síntese de indicadores reais desta tela. Análise estratégica/`,
+                `educacional — não é recomendação de investimento.`,
                 ``,
-                `--- RESUMO ---`,
-                `Preço atual: $${s.price ? s.price.toLocaleString('en-US', {minimumFractionDigits:2}) : '--'} (${s.priceChangePct >= 0 ? '+' : ''}${s.priceChangePct?.toFixed(2) ?? '--'}%)`,
-                `Sinal de confluência: ${s.confluenceSignal}`,
+                `📊 1. PANORAMA TÉCNICO`,
+                `${'-'.repeat(58)}`,
+                `Tendência (1h, MA8x21x100): ${s.trendLabel ?? '--'}`,
+                `RSI 1h:  ${s.rsi1h ?? '--'}  ${s.rsi1h > 70 ? '(sobrecompra)' : s.rsi1h < 30 ? '(sobrevenda)' : ''}`,
+                `RSI 4h:  ${s.rsi4h ?? '--'}  ${s.rsi4h > 70 ? '(sobrecompra)' : s.rsi4h < 30 ? '(sobrevenda)' : ''}`,
+                `RSI 1d:  ${s.rsi1d ?? '--'}  ${s.rsi1d > 70 ? '(sobrecompra)' : s.rsi1d < 30 ? '(sobrevenda)' : ''}`,
+                `Volatilidade: ${s.volLabel ?? '--'}`,
+                `Distância do suporte Fibo 61.8%: ${fibStr}`,
+                `Volume confirmando o sinal de confluência: ${s.confluenceSignal !== 'NEUTRO' ? 'SIM (>1.2x média 20)' : 'N/A — sem sinal ativo'}`,
+                ``,
+                `⛓️ 2. ON-CHAIN`,
+                `${'-'.repeat(58)}`,
+                `MVRV / Mayer Multiple: NÃO DISPONÍVEL — requer fonte paga`,
+                `(Glassnode/CryptoQuant), não integrada nesta versão.`,
+                `Comportamento LTH/whales e fluxo de ETF: NÃO DISPONÍVEL AO`,
+                `VIVO no dashboard — precisa checar manualmente (CoinGlass,`,
+                `Farside, SoSoValue) antes de decidir com base nisso.`,
+                ``,
+                `🌍 3. SENTIMENTO E MACRO`,
+                `${'-'.repeat(58)}`,
+                `Fear & Greed: ${s.fgValue ?? '--'} (${s.fgText ?? '--'})`,
+                `Correlação com S&P500/DXY/fluxo institucional: NÃO`,
+                `DISPONÍVEL AO VIVO — os índices globais existem na aba`,
+                `ao vivo, mas correlação cruzada não está automatizada.`,
+                `Eventos macro: SEMPRE confira datas de CPI e reunião do`,
+                `FED atualizadas — este relatório não busca isso ao vivo.`,
+                ``,
+                `🎯 4. PROPOSTA ESTRATÉGICA`,
+                `${'-'.repeat(58)}`,
+                `Preço atual: ${priceStr} (${pctStr})`,
+                `Sinal de confluência agora: ${s.confluenceSignal}`,
                 `Motivo: ${s.confluenceReason || '--'}`,
                 ``,
-                `--- INDICADORES ---`,
-                `RSI 1h:  ${s.rsi1h ?? '--'}`,
-                `RSI 4h:  ${s.rsi4h ?? '--'}`,
-                `RSI 1d:  ${s.rsi1d ?? '--'}`,
-                `Tendência (estrutura MA8x21x100): ${s.trendLabel ?? '--'}`,
-                `Volatilidade: ${s.volLabel ?? '--'}`,
-                `Distância do suporte Fibo 61.8%: ${s.distFibPct !== null && s.distFibPct !== undefined ? s.distFibPct.toFixed(1)+'%' : '--'}`,
-                `Fear & Greed: ${s.fgValue ?? '--'} (${s.fgText ?? '--'})`,
+                `Cenário de COMPRA: gatilho = RSI15m<30 + RSI1h>20 +`,
+                `tendência 1h não-baixista + volume confirmando.`,
+                `Cenário de VENDA: gatilho = RSI15m>70 + RSI1h<80 +`,
+                `tendência 1h não-altista + volume confirmando.`,
+                `R:R mínimo: 1:2. Tamanho de posição: 1-2% do capital (fixo).`,
                 ``,
                 `--- CONTRAPONTO (obrigatório) ---`,
                 s.confluenceSignal === "LONG"
-                  ? `O que invalida esta leitura: se o RSI 1h virar abaixo de 20 ou a`
+                  ? `O que invalida: RSI 1h abaixo de 20 ou tendência 1h virar BAIXA.`
                   : s.confluenceSignal === "SHORT"
-                  ? `O que invalida esta leitura: se o RSI 1h subir acima de 80 ou a`
-                  : `Sem sinal ativo — não há tese para invalidar no momento.`,
-                s.confluenceSignal !== "NEUTRO"
-                  ? `tendência 1h reverter, a confluência se desfaz e o sinal deve`
-                  : ``,
-                s.confluenceSignal !== "NEUTRO" ? `ser tratado como inválido, mesmo que o preço ainda não tenha` : ``,
-                s.confluenceSignal !== "NEUTRO" ? `se movido.` : ``,
-                ``,
-                `--- LEMBRETE DE GESTÃO DE RISCO (fixo, não muda) ---`,
-                `Risco travado: 1-2% do capital por operação.`,
-                `Isto é probabilidade condicional testada, não previsão`,
-                `com antecedência garantida de topo/fundo.`,
+                  ? `O que invalida: RSI 1h acima de 80 ou tendência 1h virar ALTA.`
+                  : `Sem sinal ativo — não há tese para invalidar agora.`,
                 ``,
                 `${'='.repeat(58)}`,
-                `Análise estratégica/educacional. Não é recomendação de`,
-                `investimento. Decisão e gestão de capital são suas.`,
+                `Gestão de capital final é sua responsabilidade. Isto NÃO`,
+                `prevê fundo/topo com antecedência garantida — é leitura`,
+                `de indicadores reais no momento atual.`,
             ];
             const fullText = lines.filter(l => l !== undefined).join('\n');
             const outputEl = document.getElementById('dosOutput');
@@ -1199,7 +1218,7 @@
 
             setTimeout(() => {
                 clearInterval(thinkingTimer);
-                typewriterEffect(outputEl, fullText, 10);
+                typewriterEffect(outputEl, fullText, 8);
             }, 1100);
 
             console.log('[generateAIReport] modal aberto, iniciando animação de escrita');
