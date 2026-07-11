@@ -324,6 +324,24 @@
                 </div>
             </div>
 
+            <div class="glass-card rounded-3xl p-5 border-t-2 border-white/10">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Varredura: Fundo × Topo</h3>
+                    <span class="text-[8px] bg-white/5 text-slate-500 px-2 py-0.5 rounded mono">score heurístico</span>
+                </div>
+                <p class="text-[9px] text-slate-500 mb-3 leading-snug">
+                    Atualiza a cada 60s. Não é probabilidade validada — vira número real depois do backtest.
+                </p>
+                <div class="flex justify-between text-[10px] font-black mono mb-1">
+                    <span id="scan-bottom-label" class="text-emerald-400">FUNDO --%</span>
+                    <span id="scan-top-label" class="text-red-400">TOPO --%</span>
+                </div>
+                <div class="h-3 w-full rounded-full bg-white/5 overflow-hidden flex">
+                    <div id="scan-bottom-bar" class="h-full bg-emerald-500 transition-all duration-700" style="width:50%"></div>
+                    <div id="scan-top-bar" class="h-full bg-red-500 transition-all duration-700" style="width:50%"></div>
+                </div>
+            </div>
+
             <div class="glass-card rounded-3xl p-5 border-t-2 border-emerald-500/20">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Sinal de Confluência</h3>
@@ -1018,6 +1036,15 @@
             setInterval(refreshMultiPeriodChange, 5 * 60000);
             setInterval(refreshFearGreed, 5 * 60000);
         };
+        function updateScanGauge(bottomScore, topScore) {
+            const total = (bottomScore + topScore) || 1;
+            const bottomPct = (bottomScore / total) * 100;
+            document.getElementById('scan-bottom-bar').style.width = `${bottomPct}%`;
+            document.getElementById('scan-top-bar').style.width = `${100 - bottomPct}%`;
+            document.getElementById('scan-bottom-label').textContent = `FUNDO ${bottomScore}%`;
+            document.getElementById('scan-top-label').textContent = `TOPO ${topScore}%`;
+        }
+
         // ---------------- Sinal de Confluência (mesma regra do confluence_engine.py) ----------------
         // LONG:  RSI(15m)<30, RSI(1h)>20, tendência 1h != BAIXA, volume>1.2x média(20), preço>MA100(15m)
         // SHORT: espelho exato invertido
@@ -1048,6 +1075,26 @@
 
                 const trendHtf = (ma8_1h && ma21_1h) ? (ma8_1h > ma21_1h ? "ALTA" : ma8_1h < ma21_1h ? "BAIXA" : "LATERAL") : "--";
                 const volOk = lastVol > avgVol20 * 1.2;
+
+                // ---- Varredura contínua: score de FUNDO x TOPO (0-100%, sempre calculado) ----
+                // Isto roda toda vez, não só quando os critérios de LONG/SHORT batem todos.
+                // Ainda é heurística de força técnica, NÃO é probabilidade validada.
+                let bottomScore = 0, topScore = 0;
+                if (rsi15 < 30) bottomScore += 35; else if (rsi15 < 40) bottomScore += 15;
+                if (rsi15 > 70) topScore += 35; else if (rsi15 > 60) topScore += 15;
+                if (rsi1h < 30) bottomScore += 20; else if (rsi1h < 45) bottomScore += 8;
+                if (rsi1h > 70) topScore += 20; else if (rsi1h > 55) topScore += 8;
+                if (trendHtf === "ALTA") topScore += 10; else if (trendHtf === "BAIXA") bottomScore += 10;
+                if (volOk) { if (rsi15 < 50) bottomScore += 15; else topScore += 15; }
+                if (liveState.fgValue !== null) {
+                    if (liveState.fgValue <= 25) bottomScore += 15;
+                    else if (liveState.fgValue >= 75) topScore += 15;
+                }
+                bottomScore = Math.min(100, Math.round(bottomScore));
+                topScore = Math.min(100, Math.round(topScore));
+                liveState.bottomScore = bottomScore;
+                liveState.topScore = topScore;
+                updateScanGauge(bottomScore, topScore);
 
                 const longCond = rsi15 < 30 && rsi1h > 20 && trendHtf !== "BAIXA" && volOk && ma100_15 && lastClose > ma100_15;
                 const shortCond = rsi15 > 70 && rsi1h < 80 && trendHtf !== "ALTA" && volOk && ma100_15 && lastClose < ma100_15;
