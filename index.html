@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL TRADER BTC - Quantum Analytics & Realtime Prediction</title>
+    <title>NEURAL TRADER BTC - Quantum Analytics V10</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -101,7 +101,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- TOAST NOTIFICATION -->
+    <!-- NOTIFICAÇÃO TOAST -->
     <div id="toast" class="fixed top-24 left-1/2 -translate-x-1/2 z-[1000] hidden w-[90%] max-w-sm">
         <div class="bg-emerald-900/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl flex items-center justify-center gap-3 border border-emerald-400/40">
             <i class="fas fa-bolt text-xs text-amber-400"></i>
@@ -109,17 +109,17 @@
         </div>
     </div>
 
-    <!-- DOS ANALYTICS TERMINAL MODAL -->
+    <!-- TERMINAL DOS DE ANÁLISE PREDITIVA -->
     <div id="dosModal" class="hidden fixed inset-0 z-[2000] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-black/90 border border-emerald-500/40 rounded-xl w-full max-w-3xl shadow-[0_0_50px_rgba(16,185,129,0.25)] overflow-hidden">
             <div class="flex justify-between items-center px-4 py-3 bg-slate-900/80 border-b border-emerald-500/30">
                 <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block cursor-pointer" onclick="closeDosModal()"></span>
-                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span>
-                    <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 cursor-pointer" onclick="closeDosModal()"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
                     <span class="text-emerald-400 mono text-[11px] font-black ml-2">NEURAL-TRADER-QUANTUM://PREDICTIONS_ENGINE_v10</span>
                 </div>
-                <button onclick="closeDosModal()" class="text-emerald-400 hover:text-white text-xs font-black px-2">[ESC / SAIR]</button>
+                <button onclick="closeDosModal()" class="text-emerald-400 hover:text-white text-xs font-black px-2">[X SAIR]</button>
             </div>
             <div class="p-4 bg-black/95">
                 <pre id="dosOutput" class="mono text-emerald-400 text-[11px] leading-relaxed overflow-y-auto whitespace-pre-wrap select-text" style="max-height: 70vh;"></pre>
@@ -127,12 +127,12 @@
         </div>
     </div>
 
-    <!-- TICKER SUPERIOR -->
+    <!-- TICKER EM TEMPO REAL -->
     <div class="ticker-container">
         <div class="ticker-wrapper" id="ticker-content"></div>
     </div>
 
-    <!-- NAVBAR -->
+    <!-- CABEÇALHO PRINCIPAL -->
     <nav class="border-b border-white/5 bg-black/70 backdrop-blur-xl px-4 md:px-8 py-3 md:py-4 flex justify-between items-center sticky top-0 z-50">
         <div class="logo-container">
             <div class="brain-logo-wrapper">
@@ -161,7 +161,7 @@
                 </h1>
                 <div class="flex items-center gap-2 mt-1">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 status-pulse"></div>
-                    <span id="conn-status" class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">SINCRONIZANDO BINANCE...</span>
+                    <span id="conn-status" class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">CÉREBRO QUANTUM ATIVO</span>
                 </div>
             </div>
         </div>
@@ -188,12 +188,10 @@
         <button id="tabBtnBacktest" onclick="switchTab('backtest')" class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400 hover:bg-white/10">📊 Validação de Backtest</button>
     </div>
 
-    <!-- ========================================== -->
-    <!-- TAB 1: COCKPIT EM TEMPO REAL -->
-    <!-- ========================================== -->
+    <!-- ABA 1: COCKPIT EM TEMPO REAL -->
     <main id="tab-live" class="flex-1 p-4 md:p-8 grid grid-cols-12 gap-4 md:gap-6 max-w-[1700px] mx-auto w-full">
 
-        <!-- COLUNA 1: F&G + MÉDIAS -->
+        <!-- COLUNA 1 -->
         <div class="col-span-12 lg:col-span-3 order-2 lg:order-1 space-y-4 md:space-y-6">
             <div class="glass-card p-6 relative overflow-hidden border-t-2 border-amber-500/30">
                 <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 text-center italic">Psicologia do Mercado (Fear & Greed)</h3>
@@ -255,7 +253,7 @@
             </div>
         </div>
 
-        <!-- COLUNA 2: GRÁFICO CENTRAL + MÉTRICAS -->
+        <!-- COLUNA 2 -->
         <div class="col-span-12 lg:col-span-6 order-1 lg:order-2 space-y-4 md:space-y-6">
             <div class="glass-card overflow-hidden border border-white/5 h-[380px] md:h-[540px] relative p-0">
                 <div class="absolute top-4 left-4 z-10 flex gap-1 bg-black/70 backdrop-blur-md rounded-xl p-1 border border-white/10">
@@ -284,7 +282,6 @@
                 <canvas id="macdChart" height="85"></canvas>
             </div>
 
-            <!-- CARDS DE ESTATÍSTICAS REAIS DE 24H -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div class="glass-card p-3 text-center">
                     <p class="text-[8px] text-slate-400 uppercase mb-1">Máxima 24h</p>
@@ -304,7 +301,6 @@
                 </div>
             </div>
 
-            <!-- VARIAÇÕES HISTÓRICAS DE PREÇO -->
             <div class="glass-card p-4">
                 <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest italic mb-3">Variação Percentual do BTC</h3>
                 <div class="grid grid-cols-3 md:grid-cols-6 gap-2 text-center">
@@ -317,7 +313,6 @@
                 </div>
             </div>
 
-            <!-- INDICADORES TÉCNICOS MULTI-TIMEFRAME -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div class="glass-card p-3 text-center border-b-2 border-red-500/40">
                     <p class="text-[8px] text-slate-400 font-bold uppercase mb-1">RSI Wilder (14)</p>
@@ -343,7 +338,7 @@
             </div>
         </div>
 
-        <!-- COLUNA 3: ESTRUTURA DE TENDÊNCIA, PREDICÃO & AÇÕES -->
+        <!-- COLUNA 3 -->
         <div class="col-span-12 lg:col-span-3 order-3 space-y-4 md:space-y-6">
             <div class="glass-card p-5 border-t-2 border-emerald-500/20">
                 <div class="flex justify-between items-center mb-3">
@@ -363,7 +358,6 @@
                 </div>
             </div>
 
-            <!-- VARREDURA PREDITIVA DE FUNDO E TOPO -->
             <div class="glass-card p-5 border-t-2 border-amber-500/30">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Probabilidade Fundo × Topo</h3>
@@ -379,7 +373,6 @@
                 </div>
             </div>
 
-            <!-- SINAL DE CONFLUÊNCIA DE MERCADO -->
             <div class="glass-card p-5 border-t-2 border-amber-500/40">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Sinal de Confluência</h3>
@@ -391,7 +384,6 @@
                 <p id="confluence-reason" class="text-[9px] text-slate-400 text-center leading-relaxed">A aguardar confirmação dos canais...</p>
             </div>
 
-            <!-- BOTAO DE EXECUCAO SIMULADA -->
             <div class="glass-card p-6">
                 <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 text-center italic">Ordens de Teste (Simulação)</h3>
                 <p class="text-[9px] text-slate-500 text-center mb-4">Executa um sinal interno para teste de estratégia sem risco financeiro.</p>
@@ -401,7 +393,6 @@
                 </div>
             </div>
 
-            <!-- STREAM DE LIQUIDAÇÕES REAIS DE FUTUROS -->
             <div class="glass-card p-5 hidden md:block">
                 <h3 class="text-[10px] font-black text-slate-400 uppercase mb-3 italic">Liquidações em Tempo Real (Binance Futures)</h3>
                 <div id="liq-stream" class="liq-stream">
@@ -410,7 +401,7 @@
             </div>
         </div>
 
-        <!-- SEÇÃO INFERIOR: COINGECKO TOP 10, HEATMAP & DADOS GLOBAIS -->
+        <!-- SEÇÃO INFERIOR -->
         <div class="col-span-12 grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mt-2">
             <div class="glass-card p-5">
                 <div class="flex justify-between items-center mb-4">
@@ -441,12 +432,9 @@
                     <div class="text-[10px] text-slate-500 italic">A carregar índices financeiros...</div>
                 </div>
             </div>
-        </div>
-    </main>
+        </section>
 
-    <!-- ========================================== -->
-    <!-- TAB 2: PROJEÇÕES & FIBONACCI (NOVA) -->
-    <!-- ========================================== -->
+    <!-- ABA 2: PROJEÇÕES & FIBONACCI (CORRIGIDA E FORMATAÇÃO AJUSTADA) -->
     <section id="tab-predict" class="hidden flex-1 p-4 md:p-8 max-w-[1700px] mx-auto w-full space-y-6">
         <div class="glass-card p-6 border-t-2 border-amber-500">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -455,7 +443,7 @@
                     <p class="text-xs text-slate-400 mt-1">Cálculo de alvos de expansão e zonas de reversão com base nas últimas 100 velas do Bitcoin.</p>
                 </div>
                 <button onclick="runQuantumScan()" class="btn-neural bg-amber-500 text-black font-black px-6 py-3 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2">
-                    <i class="fas fa-calculator"></i> Recalcular Alvos de Fibonacci
+                    <i class="fas fa-calculator"></i> RECALCULAR ALVOS DE FIBONACCI
                 </button>
             </div>
         </div>
@@ -486,9 +474,7 @@
         </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- TAB 3: VALIDAÇÃO DE BACKTEST -->
-    <!-- ========================================== -->
+    <!-- ABA 3: VALIDAÇÃO DE BACKTEST -->
     <section id="tab-backtest" class="hidden flex-1 p-4 md:p-8 max-w-[1700px] mx-auto w-full space-y-4 md:space-y-6">
         <div class="glass-card p-4 text-[11px] text-amber-400 border border-amber-500/30 bg-amber-500/5">
             <i class="fas fa-exclamation-triangle mr-2"></i> Resultado histórico simulado via motor de dados. Utilize como validação estatística de longo prazo.
@@ -527,11 +513,17 @@
         </div>
     </section>
 
-    <!-- SCRIPT PRINCIPAL E ALGORÍTMICO DE PREDIÇÃO DE BTC -->
+    <!-- SCRIPT DE PROCESSAMENTO DOS DADOS COM FORMATADOR CORRIGIDO -->
     <script>
         const SYMBOL = "BTCUSDT";
         const BINANCE_REST = "https://api.binance.com/api/v3";
         const FNG_API = "https://api.alternative.me/fng/?limit=1";
+
+        // FORMATADOR MONETÁRIO DE PREÇO CORRIGIDO (Evita $85.337,042)
+        function formatUSD(val) {
+            if (!val || isNaN(val)) return "$ --,---.--";
+            return "$ " + val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
 
         const liveState = {
             price: null, priceChangePct: null,
@@ -542,8 +534,7 @@
             confluenceSignal: "NEUTRO", confluenceReason: "",
             confidenceScore: null,
             bottomScore: null, topScore: null,
-            fibTop: 0, fibMid: 0, fibBottom: 0,
-            candles15m: []
+            fibTop: 0, fibMid: 0, fibBottom: 0
         };
 
         const state = {
@@ -566,7 +557,6 @@
             maBars: { ma8: document.getElementById('ma8-bar'), ma21: document.getElementById('ma21-bar'), ma100: document.getElementById('ma100-bar'), ma200: document.getElementById('ma200-bar') }
         };
 
-        // ---------------- MATEMÁTICA E INDICADORES TÉCNICOS ----------------
         function sma(closes, period) {
             if (!closes || closes.length < period) return null;
             const slice = closes.slice(-period);
@@ -607,7 +597,7 @@
             const entries = [["ma8", mas.ma8], ["ma21", mas.ma21], ["ma100", mas.ma100], ["ma200", mas.ma200]];
             entries.forEach(([key, val]) => {
                 if (val === null || !price) return;
-                elements.maValues[key].textContent = `$${val.toLocaleString(undefined, { maximumFractionDigits: 1 })}`;
+                elements.maValues[key].textContent = formatUSD(val);
                 const distPct = ((price - val) / val) * 100;
                 const width = Math.min(98, Math.max(5, 50 + distPct * 8));
                 elements.maBars[key].style.width = `${width}%`;
@@ -652,7 +642,7 @@
 
                 elements.rsi.textContent = rsi !== null ? rsi.toFixed(0) : "--";
                 
-                // Cálculo de Fibonacci com base em 100 períodos
+                // Cálculo de Fibonacci limpo
                 const highs = klines.slice(-100).map(k => k.high);
                 const lows = klines.slice(-100).map(k => k.low);
                 const maxH = Math.max(...highs);
@@ -663,9 +653,9 @@
                 liveState.fibMid = maxH - (diff * 0.382);
                 liveState.fibBottom = minL;
 
-                document.getElementById('target-fib-top').innerText = `$${liveState.fibTop.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-                document.getElementById('target-fib-mid').innerText = `$${liveState.fibMid.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-                document.getElementById('target-fib-bottom').innerText = `$${liveState.fibBottom.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                document.getElementById('target-fib-top').innerText = formatUSD(liveState.fibTop);
+                document.getElementById('target-fib-mid').innerText = formatUSD(liveState.fibMid);
+                document.getElementById('target-fib-bottom').innerText = formatUSD(liveState.fibBottom);
 
                 const distPct = ((price - liveState.fibMid) / price) * 100;
                 elements.distSupport.textContent = isFinite(distPct) ? `${distPct.toFixed(1)}%` : "--%";
@@ -683,7 +673,7 @@
                 const buyRatio = totalVol > 0 ? (takerBuyVol / totalVol) * 100 : 50;
                 elements.flow.textContent = buyRatio >= 50 ? `COMPRA ${buyRatio.toFixed(0)}%` : `VENDA ${(100 - buyRatio).toFixed(0)}%`;
             } catch (e) {
-                console.error("Erro ao buscar indicadores da Binance:", e);
+                console.error("Erro nos indicadores:", e);
             }
         }
 
@@ -706,11 +696,10 @@
                 liveState.fgValue = value;
                 liveState.fgText = map[classification] || classification;
             } catch (e) {
-                console.error("Erro no Fear & Greed:", e);
+                console.error("Erro Fear & Greed:", e);
             }
         }
 
-        // ---------------- DADOS DE COINGECKO & ÍNDICES ----------------
         async function refreshTopCrypto() {
             try {
                 const res = await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=24h");
@@ -731,7 +720,7 @@
                     <span class="text-[9px] text-slate-500 w-4 mono">${c.market_cap_rank}</span>
                     <img src="${c.image}" class="w-4 h-4 rounded-full" />
                     <span class="text-[10px] font-black uppercase w-10 text-white">${c.symbol}</span>
-                    <span class="mono text-[10px] flex-1 text-right text-slate-200">$${c.current_price.toLocaleString()}</span>
+                    <span class="mono text-[10px] flex-1 text-right text-slate-200">${formatUSD(c.current_price)}</span>
                     <span class="mono text-[10px] font-bold w-14 text-right ${up ? 'text-emerald-400' : 'text-red-400'}">${up ? '▲' : '▼'} ${Math.abs(c.price_change_percentage_24h || 0).toFixed(1)}%</span>
                 </div>`;
             }).join('');
@@ -779,14 +768,13 @@
                 return `
                 <div class="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
                     <span class="text-[10px] text-slate-300">${idx.name}</span>
-                    <span class="mono text-[10px] text-slate-200">${idx.price.toLocaleString()}</span>
+                    <span class="mono text-[10px] text-slate-200">${formatUSD(idx.price)}</span>
                     <span class="mono text-[10px] font-bold w-14 text-right ${up ? 'text-emerald-400' : 'text-red-400'}">${up ? '▲' : '▼'} ${Math.abs(idx.changePct).toFixed(2)}%</span>
                 </div>`;
             }).join('');
         }
 
-        // ---------------- GRÁFICO BÁSICO INTERNO ----------------
-        const chartState = { candles: [], interval: '1h', pollTimer: null };
+        const chartState = { candles: [], interval: '1h' };
         const chartCanvas = document.getElementById('liveChart');
         const macdCanvas = document.getElementById('macdChart');
 
@@ -851,7 +839,7 @@
                 drawLiveChart();
                 document.getElementById('chart-status-text').textContent = `Conectado Binance · ${interval}`;
             } catch (e) {
-                document.getElementById('chart-status-text').textContent = 'Erro ao sincronizar';
+                document.getElementById('chart-status-text').textContent = 'Erro de Sincronização';
             }
         }
 
@@ -866,7 +854,6 @@
             loadChartData(interval);
         }
 
-        // ---------------- EXECUÇÃO DA PREDIÇÃO QUANTUM V10 ----------------
         async function runQuantumScan() {
             const term = document.getElementById('predict-terminal');
             if (!term) return;
@@ -880,14 +867,14 @@
             const bottomTarget = liveState.fibBottom || (p * 0.95);
 
             const logs = [
-                `>> PREÇO BASE DETECTADO: $${p.toLocaleString('en-US', {minimumFractionDigits: 2})}`,
+                `>> PREÇO BASE DETECTADO: ${formatUSD(p)}`,
                 `>> ANÁLISE DE VOLATILIDADE REALIZADA: ${liveState.volLabel}`,
                 `>> ESTRUTURA DE TENDÊNCIA 1H: ${liveState.trendLabel}`,
                 `>> DIVERGÊNCIA RSI (1H): ${liveState.rsi1h || '--'}`,
-                `>> PROJEÇÃO FIBONACCI EXTENSÃO (1.618): $${topTarget.toLocaleString('en-US', {minimumFractionDigits: 2})}`,
-                `>> ZONA DE REVERSÃO / PONTOS DE EQUILÍBRIO: $${midTarget.toLocaleString('en-US', {minimumFractionDigits: 2})}`,
-                `>> INVALIDAÇÃO DA ESTRUTURA (STOP LOSS MACRO): $${bottomTarget.toLocaleString('en-US', {minimumFractionDigits: 2})}`,
-                `>> STATUS DA ORDEM: TENDÊNCIA COM ALTA PROBABILIDADE DE TESTAR $${topTarget.toFixed(0)} NAS PRÓXIMAS JANELAS DE MERCADO.`,
+                `>> PROJEÇÃO FIBONACCI EXTENSÃO (1.618): ${formatUSD(topTarget)}`,
+                `>> ZONA DE REVERSÃO / PONTOS DE EQUILÍBRIO: ${formatUSD(midTarget)}`,
+                `>> INVALIDAÇÃO DA ESTRUTURA (STOP LOSS MACRO): ${formatUSD(bottomTarget)}`,
+                `>> STATUS DA ORDEM: TENDÊNCIA COM ALTA PROBABILIDADE DE TESTAR ${formatUSD(topTarget)} NAS PRÓXIMAS JANELAS DE MERCADO.`,
                 `>> PROCESSAMENTO QUANTUM CONCLUÍDO COM SUCESSO.`
             ];
 
@@ -903,17 +890,10 @@
             }, 300);
         }
 
-        // ---------------- RENDERIZAÇÃO DE PREÇO E INTERFACE ----------------
-        function updateUI() {
-            if (elements.price) {
-                elements.price.textContent = `$${state.btcPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-            }
-        }
-
         function renderTicker() {
             const content = Object.entries(state.tickerData).map(([s, d]) => {
                 const isPos = d.c >= 0;
-                return `<span class="mx-6 inline-flex items-center gap-2"><span class="text-slate-500 font-black text-[11px] italic">${s}</span><span class="text-white mono font-bold text-[11px]">$${d.p.toLocaleString()}</span><span class="${isPos ? 'text-emerald-400' : 'text-red-400'} mono font-black text-[10px]">${isPos ? '▲' : '▼'} ${d.c.toFixed(2)}%</span></span>`;
+                return `<span class="mx-6 inline-flex items-center gap-2"><span class="text-slate-500 font-black text-[11px] italic">${s}</span><span class="text-white mono font-bold text-[11px]">${formatUSD(d.p)}</span><span class="${isPos ? 'text-emerald-400' : 'text-red-400'} mono font-black text-[10px]">${isPos ? '▲' : '▼'} ${d.c.toFixed(2)}%</span></span>`;
             }).join('');
             elements.ticker.innerHTML = content + content;
         }
@@ -928,7 +908,7 @@
 
                 if (sym === 'BTC') {
                     state.btcPrice = state.tickerData[sym].p;
-                    elements.price.textContent = `$${state.btcPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                    elements.price.textContent = formatUSD(state.btcPrice);
                     elements.pricePct.textContent = `${state.tickerData[sym].c >= 0 ? '+' : ''}${state.tickerData[sym].c.toFixed(2)}%`;
                     elements.pricePct.className = `text-[10px] md:text-xs font-black mono ${state.tickerData[sym].c >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
                 }
@@ -965,7 +945,6 @@
             }
         }
 
-        // RELATÓRIO PREVISIONAL GERADO NO TERMINAL DOS
         function generateAIReport() {
             const p = state.btcPrice || liveState.price || 0;
             const top = liveState.fibTop || (p * 1.04);
@@ -974,18 +953,18 @@
             const lines = [
                 `NEURAL TRADER BTC — RELATÓRIO QUANTUM DE PREDIÇÃO`,
                 `==========================================================`,
-                `PREÇO ATUAL DO BITCOIN: $${p.toLocaleString('en-US', {minimumFractionDigits: 2})}`,
+                `PREÇO ATUAL DO BITCOIN: ${formatUSD(p)}`,
                 `ESTRUTURA DE MERCADO: ${liveState.trendLabel || 'EM ANÁLISE'}`,
                 `SENTIMENTO (FEAR & GREED): ${liveState.fgValue || '--'} (${liveState.fgText || '--'})`,
                 ``,
                 `🔮 PROJEÇÃO PREDITIVA DE MOVIMENTO:`,
                 `----------------------------------------------------------`,
-                `1. O PREÇO ENCONTRARÁ RESISTÊNCIA DE ALVO EM: $${top.toLocaleString('en-US', {minimumFractionDigits: 2})}`,
-                `2. ZONA DE SUPORTE E CRÍTICA DE REVERSÃO: $${bottom.toLocaleString('en-US', {minimumFractionDigits: 2})}`,
+                `1. O PREÇO ENCONTRARÁ RESISTÊNCIA DE ALVO EM: ${formatUSD(top)}`,
+                `2. ZONA DE SUPORTE E CRÍTICA DE REVERSÃO: ${formatUSD(bottom)}`,
                 `3. INDICADOR RSI (1H): ${liveState.rsi1h || '--'} | FLUXO DE COMPRAS: ${elements.flow.textContent}`,
                 ``,
                 `VEREDITO TÉCNICO:`,
-                `O Bitcoin apresenta sustentação algorítmica. Recomendado acompanhar a reação no ponto de retração $${liveState.fibMid?.toFixed(0) || '--'} para alvos em $${top.toFixed(0)}.`,
+                `O Bitcoin apresenta sustentação algorítmica. Recomendado acompanhar a reação no ponto de retração ${formatUSD(liveState.fibMid)} para alvos em ${formatUSD(top)}.`,
                 `==========================================================`
             ];
 
