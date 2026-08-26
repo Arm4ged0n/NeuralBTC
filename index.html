@@ -373,16 +373,16 @@
                 </div>
             </div>
 
-            <!-- CARD SINAL DE CONFLUÊNCIA CORRIGIDO SEM TRAVAMENTOS -->
+            <!-- CARD SINAL DE CONFLUÊNCIA GARANTIDO -->
             <div class="glass-card p-5 border-t-2 border-amber-500/40">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Sinal de Confluência</h3>
                     <span class="text-[8px] bg-white/5 text-slate-400 px-2 py-0.5 rounded mono">Multi-Indicadores</span>
                 </div>
                 <div id="confluence-badge" class="text-center py-3 rounded-xl bg-white/5 mb-2 transition-all">
-                    <span class="text-lg font-black text-slate-400">SINC. MERCADO...</span>
+                    <span class="text-lg font-black text-amber-400">SINC. MERCADO...</span>
                 </div>
-                <p id="confluence-reason" class="text-[9px] text-slate-400 text-center leading-relaxed">A processar canais técnicos...</p>
+                <p id="confluence-reason" class="text-[9px] text-slate-400 text-center leading-relaxed">A calcular canais técnicos...</p>
             </div>
 
             <div class="glass-card p-6">
@@ -518,7 +518,7 @@
         </div>
     </section>
 
-    <!-- SCRIPT DE PROCESSAMENTO ROBUSTO SEM TRAVAMENTOS -->
+    <!-- SCRIPT DE PROCESSAMENTO DOS DADOS COM FORMATADOR E CONTROLE DE CONFLUÊNCIA INSTANTÂNEO -->
     <script>
         const SYMBOL = "BTCUSDT";
         const BINANCE_REST = "https://api.binance.com/api/v3";
@@ -677,17 +677,16 @@
                 const buyRatio = totalVol > 0 ? (takerBuyVol / totalVol) * 100 : 50;
                 elements.flow.textContent = buyRatio >= 50 ? `COMPRA ${buyRatio.toFixed(0)}%` : `VENDA ${(100 - buyRatio).toFixed(0)}%`;
 
-                // AVALIAÇÃO DE CONFLUÊNCIA GARANTIDA
-                evaluateConfluence(closes, klines);
+                // AVALIAÇÃO DE CONFLUÊNCIA INSTANTÂNEA E GARANTIDA
+                evaluateConfluence(closes);
             } catch (e) {
                 console.error("Erro nos indicadores:", e);
-                // Fallback em caso de erro de rede
                 evaluateConfluenceFallback();
             }
         }
 
-        // LÓGICA DE AVALIAÇÃO DO SINAL DE CONFLUÊNCIA ROBUSTA (SEM TRAVAR)
-        function evaluateConfluence(closes, klines) {
+        // LÓGICA DE AVALIAÇÃO DO SINAL DE CONFLUÊNCIA GARANTIDA
+        function evaluateConfluence(closes) {
             const badge = document.getElementById('confluence-badge');
             const reasonEl = document.getElementById('confluence-reason');
             if (!badge || !reasonEl) return;
@@ -695,13 +694,11 @@
             const rsi1h = wilderRSI(closes, 14) || 50;
             const ma8 = sma(closes, 8);
             const ma21 = sma(closes, 21);
-            const ma100 = sma(closes, 100);
-            const lastClose = closes[closes.length - 1];
 
             let bottomScore = 50;
             let topScore = 50;
 
-            if (rsi1h < 35) {
+            if (rsi1h < 38) {
                 bottomScore += 30;
                 topScore -= 20;
             } else if (rsi1h > 65) {
@@ -725,18 +722,18 @@
             document.getElementById('scan-bottom-label').textContent = `FUNDO ${bottomScore}%`;
             document.getElementById('scan-top-label').textContent = `TOPO ${topScore}%`;
 
-            if (rsi1h < 38 && ma8 > ma21) {
+            if (rsi1h < 40 && ma8 && ma21 && ma8 > ma21) {
                 badge.innerHTML = `<span class="text-lg font-black text-emerald-400">LONG (COMPRA)</span>`;
                 badge.className = "text-center py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 mb-2";
-                reasonEl.textContent = `RSI 1H (${rsi1h.toFixed(0)}) na zona de suporte com alinhamento comprador de EMAs.`;
-            } else if (rsi1h > 68 && ma8 < ma21) {
+                reasonEl.textContent = `RSI 1H (${rsi1h.toFixed(0)}) em zona de oportunidade com tendência de alta.`;
+            } else if (rsi1h > 65 && ma8 && ma21 && ma8 < ma21) {
                 badge.innerHTML = `<span class="text-lg font-black text-red-400">SHORT (VENDA)</span>`;
                 badge.className = "text-center py-3 rounded-xl bg-red-500/10 border border-red-500/30 mb-2";
-                reasonEl.textContent = `RSI 1H (${rsi1h.toFixed(0)}) em sobrecompra com rejeição nas médias rápidas.`;
+                reasonEl.textContent = `RSI 1H (${rsi1h.toFixed(0)}) sobrecomprado com cruzamento vendedor.`;
             } else {
                 badge.innerHTML = `<span class="text-lg font-black text-amber-400">NEUTRO (AGUARDAR)</span>`;
                 badge.className = "text-center py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 mb-2";
-                reasonEl.textContent = `Mercado em consolidação. RSI 1H em ${rsi1h.toFixed(0)} - Aguardando rompimento de fluxo.`;
+                reasonEl.textContent = `Mercado em consolidação. RSI 1H em ${rsi1h.toFixed(0)} - Aguardando fluxo decisivo.`;
             }
         }
 
@@ -744,8 +741,8 @@
             const badge = document.getElementById('confluence-badge');
             const reasonEl = document.getElementById('confluence-reason');
             if (badge && reasonEl) {
-                badge.innerHTML = `<span class="text-lg font-black text-amber-400">SINAL EM SINC.</span>`;
-                reasonEl.textContent = `Sincronizando feed de preços ao vivo com Binance...`;
+                badge.innerHTML = `<span class="text-lg font-black text-amber-400">NEUTRO (AGUARDAR)</span>`;
+                reasonEl.textContent = `Sincronizando fluxo com a Binance...`;
             }
         }
 
@@ -1108,9 +1105,9 @@
             refreshTopCrypto();
             refreshGlobalIndices();
 
-            setInterval(refreshIndicators, 30000);
-            setInterval(refreshMultiTimeframeRSI, 60000);
-            setInterval(refreshTopCrypto, 60000);
+            setInterval(refreshIndicators, 15000);
+            setInterval(refreshMultiTimeframeRSI, 30000);
+            setInterval(refreshTopCrypto, 45000);
         };
     </script>
 </body>
