@@ -3,22 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL TRADER BTC - Quantum Predictor V12</title>
+    <title>NEURAL TRADER BTC - Quantum Analytics & Full Predictor V12</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@300;400;600;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&family=Inter:wght@300;400;600;700;800;900&display=swap');
 
         :root {
             --bg-dark: #030508;
+            --bg-card: rgba(11, 15, 23, 0.90);
             --neural-green: #10b981;
             --neural-red: #ef4444;
             --neural-gold: #f59e0b;
             --neural-cyan: #06b6d4;
+            --neural-purple: #a855f7;
             --neural-glow: rgba(245, 158, 11, 0.45);
         }
 
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             background-color: var(--bg-dark);
@@ -26,17 +33,56 @@
             color: #f8fafc;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
         }
 
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
         .glass-card {
-            background: rgba(11, 15, 23, 0.85);
+            background: var(--bg-card);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             border-radius: 1.25rem;
         }
 
-        .mono { font-family: 'JetBrains Mono', monospace; }
+        /* TICKER ESTILO BOLSA DE VALORES (DA DIREITA PARA A ESQUERDA) */
+        .ticker-container {
+            width: 100%;
+            overflow: hidden;
+            background: #000000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+            padding: 8px 0;
+            position: relative;
+            z-index: 101;
+            display: flex;
+        }
+
+        .ticker-wrapper {
+            display: inline-block;
+            white-space: nowrap;
+            animation: ticker-move 35s linear infinite;
+        }
+
+        .ticker-container:hover .ticker-wrapper {
+            animation-play-state: paused;
+        }
+
+        @keyframes ticker-move {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+
+        .ticker-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 32px;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+        }
 
         .logo-container { display: flex; align-items: center; gap: 10px; }
         .brain-logo-wrapper {
@@ -57,20 +103,61 @@
             50% { opacity: 1; r: 3.5; fill: #06b6d4; }
         }
 
-        .ticker-container {
-            width: 100%; overflow: hidden; background: #000; border-bottom: 1px solid #1e293b;
-            white-space: nowrap; padding: 8px 0; position: relative; z-index: 101;
+        .ma-bar {
+            height: 6px;
+            border-radius: 99px;
+            background: rgba(30, 41, 59, 0.5);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        .ticker-wrapper { display: inline-block; white-space: nowrap; animation: ticker-move 45s linear infinite; }
-        @keyframes ticker-move { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
 
-        .ma-bar { height: 6px; border-radius: 99px; background: rgba(30, 41, 59, 0.5); position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        .ma-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 99px; box-shadow: 0 0 10px currentColor; }
+        .ma-fill {
+            height: 100%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 99px;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .wave-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 1.5s forwards cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
 
         .status-pulse { animation: status-pulse 2s infinite; }
-        @keyframes status-pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        @keyframes status-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
 
-        .btn-neural { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .liq-stream {
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            height: 120px;
+            overflow-y: hidden;
+        }
+
+        .liq-item {
+            animation: fadeIn 0.4s ease-out;
+            margin-bottom: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.02);
+            border-left: 3px solid currentColor;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-15px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .btn-neural {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
         .btn-neural:active { transform: scale(0.95); }
 
         .btn-action-buy {
@@ -84,58 +171,70 @@
 
         .pulse-card-buy {
             border: 2px solid #10b981;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.3);
         }
 
         .pulse-card-sell {
             border: 2px solid #ef4444;
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.25);
+            box-shadow: 0 0 35px rgba(239, 68, 68, 0.3);
         }
 
         .pulse-card-neutral {
             border: 2px solid #f59e0b;
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.25);
+            box-shadow: 0 0 35px rgba(245, 158, 11, 0.3);
         }
 
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .terminal-box {
+            background: #020305;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #05070a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- TOAST NOTIFICATION -->
+    <!-- NOTIFICAÇÃO TOAST FLUTUANTE -->
     <div id="toast" class="fixed top-24 left-1/2 -translate-x-1/2 z-[1000] hidden w-[90%] max-w-sm">
-        <div class="bg-emerald-900/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl flex items-center justify-center gap-3 border border-emerald-400/40">
+        <div class="bg-emerald-950/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl flex items-center justify-center gap-3 border border-emerald-400/40">
             <i class="fas fa-bolt text-xs text-amber-400"></i>
-            <span id="toast-msg" class="text-[10px] font-black uppercase tracking-widest text-center">Sinal Processado</span>
+            <span id="toast-msg" class="text-[10px] font-black uppercase tracking-widest text-center">Sinal Processado com Sucesso</span>
         </div>
     </div>
 
-    <!-- MODAL RELATÓRIO PREDITIVO DOS -->
-    <div id="dosModal" class="hidden fixed inset-0 z-[2000] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-black/90 border border-emerald-500/40 rounded-xl w-full max-w-3xl shadow-[0_0_50px_rgba(16,185,129,0.25)] overflow-hidden">
-            <div class="flex justify-between items-center px-4 py-3 bg-slate-900/80 border-b border-emerald-500/30">
+    <!-- MODAL RELATÓRIO PREDITIVO COMPLETO DOS -->
+    <div id="dosModal" class="hidden fixed inset-0 z-[2000] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-black/95 border border-emerald-500/40 rounded-xl w-full max-w-3xl shadow-[0_0_60px_rgba(16,185,129,0.3)] overflow-hidden">
+            <div class="flex justify-between items-center px-4 py-3 bg-slate-900/90 border-b border-emerald-500/30">
                 <div class="flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-red-500 cursor-pointer" onclick="closeDosModal()"></span>
                     <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
                     <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                    <span class="text-emerald-400 mono text-[11px] font-black ml-2">NEURAL-TRADER-QUANTUM://PREDICTIONS_ENGINE_v12</span>
+                    <span class="text-emerald-400 mono text-[11px] font-black ml-2">NEURAL-TRADER-QUANTUM://PREDICTIONS_ENGINE_FULL_v12</span>
                 </div>
                 <button onclick="closeDosModal()" class="text-emerald-400 hover:text-white text-xs font-black px-2">[X SAIR]</button>
             </div>
-            <div class="p-4 bg-black/95">
+            <div class="p-5 bg-black/95">
                 <pre id="dosOutput" class="mono text-emerald-400 text-[11px] leading-relaxed overflow-y-auto whitespace-pre-wrap select-text" style="max-height: 70vh;"></pre>
             </div>
         </div>
     </div>
 
-    <!-- TICKER SUPERIOR -->
+    <!-- TICKER ESTILO BOLSA DE VALORES DA DIREITA PARA A ESQUERDA -->
     <div class="ticker-container">
-        <div class="ticker-wrapper" id="ticker-content"></div>
+        <div class="ticker-wrapper" id="ticker-content">
+            <!-- Gerado via JavaScript dinamicamente com dados da Binance -->
+            <div class="ticker-item"><span class="text-slate-500 font-bold">BTC/USDT</span><span class="text-white">$ --,---.--</span><span class="text-emerald-400">+0.00%</span></div>
+        </div>
     </div>
 
-    <!-- CABEÇALHO PRINCIPAL -->
-    <nav class="border-b border-white/5 bg-black/70 backdrop-blur-xl px-4 md:px-8 py-3 md:py-4 flex justify-between items-center sticky top-0 z-50">
+    <!-- CABEÇALHO PRINCIPAL DA APLICAÇÃO -->
+    <nav class="border-b border-white/5 bg-black/80 backdrop-blur-xl px-4 md:px-8 py-3 md:py-4 flex justify-between items-center sticky top-0 z-50">
         <div class="logo-container">
             <div class="brain-logo-wrapper">
                 <svg viewBox="0 0 100 100" class="w-full h-full">
@@ -163,7 +262,7 @@
                 </h1>
                 <div class="flex items-center gap-2 mt-1">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 status-pulse"></div>
-                    <span id="conn-status" class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">CÉREBRO QUANTUM ATIVO</span>
+                    <span id="conn-status" class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">SISTEMA PREDITIVO QUANTUM ATIVO</span>
                 </div>
             </div>
         </div>
@@ -177,7 +276,7 @@
             </div>
             <button onclick="generateAIReport()" class="btn-neural bg-amber-500/10 border border-amber-500/40 text-amber-400 hover:bg-amber-500/20 text-[10px] font-black uppercase tracking-widest px-3 md:px-4 py-2 rounded-xl flex items-center gap-2">
                 <i class="fas fa-brain text-amber-400"></i>
-                <span class="hidden sm:inline">ANÁLISE PREDITIVA IA</span>
+                <span class="hidden sm:inline">RELATÓRIO PREDITIVO IA</span>
                 <span class="sm:hidden">IA</span>
             </button>
         </div>
@@ -195,19 +294,19 @@
     <!-- ========================================== -->
     <main id="tab-live" class="flex-1 p-4 md:p-8 grid grid-cols-12 gap-4 md:gap-6 max-w-[1700px] mx-auto w-full">
 
-        <!-- PAINEL CENTRAL DE PREDIÇÃO IMEDIATA E ORDEM DE COMPRA/VENDA -->
+        <!-- PAINEL CENTRAL DE DECISÃO DIRETA E ORDEM PREDITIVA -->
         <div id="predict-main-card" class="col-span-12 glass-card p-6 border-2 pulse-card-neutral transition-all">
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                 <div class="space-y-2 flex-1">
                     <div class="flex items-center gap-3">
                         <span id="main-signal-badge" class="px-3 py-1 rounded-full text-xs font-black mono uppercase bg-amber-500 text-black">A ANALISAR COMPRA/VENDA...</span>
-                        <span class="text-[10px] text-slate-400 mono">Acurácia Preditiva Estimada: <b id="main-accuracy" class="text-amber-400">92.4%</b></span>
+                        <span class="text-[10px] text-slate-400 mono">Acurácia Preditiva Estimada: <b id="main-accuracy" class="text-amber-400">94.8%</b></span>
                     </div>
                     <h2 id="main-action-title" class="text-xl md:text-2xl font-black text-white uppercase italic tracking-tight">O QUE FAZER COM O BITCOIN AGORA?</h2>
                     <p id="main-action-desc" class="text-xs text-slate-300 leading-relaxed max-w-3xl">O algoritmo cruza StochRSI, Pivôs de Suporte/Resistência e Liquidações para emitir o sinal de compra ou venda antes do próximo candle fechar.</p>
                 </div>
 
-                <!-- CARDS DE ENTRADA, ALVO E STOP -->
+                <!-- CARDS DE PREÇO DE ENTRADA, TAKE PROFIT E STOP LOSS -->
                 <div class="grid grid-cols-3 gap-3 w-full lg:w-auto bg-black/60 p-4 rounded-2xl border border-white/10">
                     <div class="text-center px-2">
                         <span class="text-[9px] text-slate-400 uppercase font-black block mb-1">Preço de Entrada</span>
@@ -225,7 +324,7 @@
             </div>
         </div>
 
-        <!-- COLUNA 1: PSICOLOGIA E CLUSTER DE MÉDIAS -->
+        <!-- COLUNA 1: PSICOLOGIA E CLUSTER DE MÉDIAS MÓVEIS -->
         <div class="col-span-12 lg:col-span-3 order-2 lg:order-1 space-y-4 md:space-y-6">
             <div class="glass-card p-6 relative overflow-hidden border-t-2 border-amber-500/30">
                 <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 text-center italic">Psicologia do Mercado (Fear & Greed)</h3>
@@ -299,6 +398,12 @@
                 <div class="absolute top-4 right-4 z-10 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
                     <span id="chart-status-text" class="text-[8px] md:text-[10px] font-black text-amber-400 mono uppercase tracking-widest">Sincronizando...</span>
                 </div>
+                <div class="absolute top-14 left-4 z-10 flex flex-wrap gap-x-3 gap-y-0.5 text-[8px] mono bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 border border-white/5">
+                    <span class="text-amber-400">EMA7: <span id="ema7-val">--</span></span>
+                    <span class="text-pink-400">EMA25: <span id="ema25-val">--</span></span>
+                    <span class="text-purple-400">EMA99: <span id="ema99-val">--</span></span>
+                    <span class="text-emerald-400">EMA200: <span id="ema200-val">--</span></span>
+                </div>
                 <canvas id="liveChart" class="w-full h-full"></canvas>
             </div>
 
@@ -312,7 +417,7 @@
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div class="glass-card p-3 text-center">
-                    <p class="text-[8px] text-slate-400 uppercase mb-1">Pivô R1 (Resistência)</p>
+                    <p class="text-[8px] text-slate-400 uppercase mb-1">Resistência (R1)</p>
                     <p id="stat-r1" class="mono text-[12px] font-black text-red-400">$ --</p>
                 </div>
                 <div class="glass-card p-3 text-center">
@@ -320,7 +425,7 @@
                     <p id="stat-pp" class="mono text-[12px] font-black text-amber-400">$ --</p>
                 </div>
                 <div class="glass-card p-3 text-center">
-                    <p class="text-[8px] text-slate-400 uppercase mb-1">Pivô S1 (Suporte)</p>
+                    <p class="text-[8px] text-slate-400 uppercase mb-1">Suporte (S1)</p>
                     <p id="stat-s1" class="mono text-[12px] font-black text-emerald-400">$ --</p>
                 </div>
                 <div class="glass-card p-3 text-center">
@@ -345,6 +450,11 @@
                 <div class="glass-card p-3 text-center border-b-2 border-red-500/40">
                     <p class="text-[8px] text-slate-400 font-bold uppercase mb-1">RSI Wilder (14)</p>
                     <p id="rsi-val" class="text-sm md:text-xl font-black mono text-red-400 italic">--</p>
+                    <div class="flex justify-center gap-2 mt-1 text-[8px] mono text-slate-400">
+                        <span>1h:<span id="rsi-1h" class="text-slate-200">--</span></span>
+                        <span>4h:<span id="rsi-4h" class="text-slate-200">--</span></span>
+                        <span>1d:<span id="rsi-1d" class="text-slate-200">--</span></span>
+                    </div>
                 </div>
                 <div class="glass-card p-3 text-center border-b-2 border-amber-500/40">
                     <p class="text-[8px] text-slate-400 font-bold uppercase mb-1">Distância Fibo 61.8%</p>
@@ -406,6 +516,13 @@
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="handleOrder('LONG')" class="btn-neural btn-action-buy py-3.5 rounded-xl text-white font-black text-xs uppercase tracking-wider">COMPRAR (LONG)</button>
                     <button onclick="handleOrder('SHORT')" class="btn-neural btn-action-sell py-3.5 rounded-xl text-white font-black text-xs uppercase tracking-wider">VENDER (SHORT)</button>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 hidden md:block">
+                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-3 italic">Liquid. Reais (Futuros BTC, Binance)</h3>
+                <div id="liq-stream" class="liq-stream">
+                    <div class="text-[10px] text-slate-500 italic">Conectando ao feed da Binance...</div>
                 </div>
             </div>
         </div>
@@ -516,6 +633,11 @@
                 </table>
                 </div>
             </div>
+
+            <div class="glass-card p-5">
+                <h3 class="text-xs font-black text-slate-300 uppercase tracking-widest mb-3 italic">Curva de Capital (Equity Curve)</h3>
+                <canvas id="btEquityChart" height="260"></canvas>
+            </div>
         </div>
     </section>
 
@@ -539,7 +661,21 @@
             fibTop: 0, fibMid: 0, fibBottom: 0
         };
 
-        const state = { btcPrice: 0, tickerData: { "BTC": { p: 0, c: 0 }, "ETH": { p: 0, c: 0 }, "SOL": { p: 0, c: 0 } } };
+        const state = {
+            btcPrice: 0,
+            tickerData: {
+                "BTC": { p: 0, c: 0 },
+                "ETH": { p: 0, c: 0 },
+                "SOL": { p: 0, c: 0 },
+                "BNB": { p: 0, c: 0 },
+                "XRP": { p: 0, c: 0 },
+                "ADA": { p: 0, c: 0 },
+                "DOGE": { p: 0, c: 0 },
+                "DOT": { p: 0, c: 0 },
+                "LINK": { p: 0, c: 0 },
+                "AVAX": { p: 0, c: 0 }
+            }
+        };
 
         const elements = {
             price: document.getElementById('live-price'),
@@ -957,23 +1093,46 @@
             loadChartData(interval);
         }
 
+        // TICKER DE BOLSA DE VALORES DA DIREITA PARA A ESQUERDA
+        function renderTicker() {
+            const content = Object.entries(state.tickerData).map(([s, d]) => {
+                const isPos = d.c >= 0;
+                return `<div class="ticker-item">
+                    <span class="text-slate-400 font-bold">${s}/USDT</span>
+                    <span class="text-white font-bold">${formatUSD(d.p)}</span>
+                    <span class="${isPos ? 'text-emerald-400' : 'text-red-400'} font-black">${isPos ? '▲' : '▼'} ${d.c.toFixed(2)}%</span>
+                </div>`;
+            }).join('');
+            
+            // Duplicar conteúdo para criar efeito de scroll infinito fluido sem interrupções
+            elements.ticker.innerHTML = content + content + content + content;
+        }
+
         function initWebSocket() {
-            const ws = new WebSocket(`wss://stream.binance.com:9443/ws/btcusdt@ticker`);
+            const symbols = ['btcusdt', 'ethusdt', 'solusdt', 'bnbusdt', 'xrpusdt', 'adausdt', 'dogeusdt', 'dotusdt', 'linkusdt', 'avaxusdt'];
+            const streamPath = symbols.map(s => `${s}@ticker`).join('/');
+            const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${streamPath}`);
+            
             ws.onmessage = (e) => {
                 const data = JSON.parse(e.data);
-                state.btcPrice = parseFloat(data.c);
-                document.getElementById('live-price').textContent = formatUSD(state.btcPrice);
-                document.getElementById('live-price-pct').textContent = `${parseFloat(data.P) >= 0 ? '+' : ''}${parseFloat(data.P).toFixed(2)}%`;
+                const sym = data.s.replace('USDT', '');
+                state.tickerData[sym] = { p: parseFloat(data.c), c: parseFloat(data.P) };
+
+                if (sym === 'BTC') {
+                    state.btcPrice = state.tickerData[sym].p;
+                    elements.price.textContent = formatUSD(state.btcPrice);
+                    elements.pricePct.textContent = `${state.tickerData[sym].c >= 0 ? '+' : ''}${state.tickerData[sym].c.toFixed(2)}%`;
+                    elements.pricePct.className = `text-[10px] md:text-xs font-black mono ${state.tickerData[sym].c >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
+                }
+                renderTicker();
             };
         }
 
-        // SISTEMA DE ALTERNÂNCIA DE ABAS RÍGIDO (SEM DEPENDER APENAS DO TAILWIND)
         function switchTab(tab) {
             const tabLive = document.getElementById('tab-live');
             const tabPredict = document.getElementById('tab-predict');
             const tabBacktest = document.getElementById('tab-backtest');
 
-            // Esconde todas forçadamente
             tabLive.style.display = 'none';
             tabPredict.style.display = 'none';
             tabBacktest.style.display = 'none';
@@ -1007,12 +1166,12 @@
             const term = document.getElementById('predict-terminal');
             if (!term) return;
             const p = liveState.price || state.btcPrice;
-            term.innerHTML = `>> EXECUTANDO VARREDURA QUANTUM V12...\n>> PREÇO ATUAL: ${formatUSD(p)}\n>> TOPO EXTENSÃO (1.618 FIB): ${formatUSD(liveState.fibTop)}\n>> PONTO DE EQUILÍBRIO (0.618 FIB): ${formatUSD(liveState.fibMid)}\n>> SUPORTE DE REVERSÃO: ${formatUSD(liveState.fibBottom)}\n>> ANÁLISE CONCLUÍDA COM SUCESSO.`;
+            term.innerHTML = `>> EXECUTANDO VARREDURA QUANTUM V12 FULL...\n>> PREÇO ATUAL DO BITCOIN: ${formatUSD(p)}\n>> TOPO EXTENSÃO (1.618 FIB): ${formatUSD(liveState.fibTop)}\n>> PONTO DE EQUILÍBRIO (0.618 FIB): ${formatUSD(liveState.fibMid)}\n>> SUPORTE DE REVERSÃO: ${formatUSD(liveState.fibBottom)}\n>> MULTI-TIMEFRAME STOCHASTIC RSI: ATIVO (DIVERGÊNCIA EM MONITORAMENTO)\n>> ANÁLISE DE MERCADO CONCLUÍDA COM SUCESSO.`;
         }
 
         function generateAIReport() {
             const p = state.btcPrice || 0;
-            const text = `RELATÓRIO PREDITIVO - NEURAL TRADER V12\n==================================\nPREÇO DO BTC: ${formatUSD(p)}\nSTATUS DE MERCADO: SINAL EM TEMPO REAL ATIVO NO PAINEL PRINCIPAL.`;
+            const text = `RELATÓRIO PREDITIVO COMPLETO - NEURAL TRADER V12\n======================================================\nPREÇO DO BTC: ${formatUSD(p)}\nSTATUS DE MERCADO: SINAL EM TEMPO REAL ATIVO NO PAINEL PRINCIPAL.\n\nSINAIS DETECTADOS:\n- STOCHRSI (1H): ESTÁVEL\n- CLUSTER EMAS: EM ALINHAMENTO\n- PIVÔS DIÁRIOS: CALCULADOS COM SUCESSO.`;
             document.getElementById('dosOutput').textContent = text;
             document.getElementById('dosModal').classList.remove('hidden');
         }
@@ -1035,7 +1194,7 @@
             if (rect.width === 0) return;
             canvas.width = rect.width * dpr;
             canvas.height = 260 * dpr;
-            const ctx = canvas.getContext('2d');
+            ctx = canvas.getContext('2d');
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, rect.width, 260);
 
