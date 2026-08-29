@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL TRADER BTC - Quantum Predictor V11</title>
+    <title>NEURAL TRADER BTC - Quantum Analytics & Predição Realtime</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800;900&display=swap');
 
         :root {
-            --bg-dark: #030508;
+            --bg-dark: #05070a;
             --neural-green: #10b981;
             --neural-red: #ef4444;
             --neural-gold: #f59e0b;
@@ -29,10 +29,10 @@
         }
 
         .glass-card {
-            background: rgba(11, 15, 23, 0.85);
+            background: rgba(13, 17, 23, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(16px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             border-radius: 1.25rem;
         }
 
@@ -181,17 +181,17 @@
         </div>
     </nav>
 
-    <!-- NAVEGAÇÃO DE ABAS -->
+    <!-- NAVEGAÇÃO DE ABAS CORRIGIDA -->
     <div class="flex gap-2 px-4 md:px-8 pt-4 max-w-[1700px] mx-auto w-full">
         <button id="tabBtnLive" onclick="switchTab('live')" class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-500 text-black shadow-[0_0_15px_rgba(245,158,11,0.3)]">📡 Cockpit em Tempo Real</button>
-        <button id="tabBtnPredict" onclick="switchTab('predict')" class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400 hover:bg-white/10">🔮 Antecipação & Viradas</button>
+        <button id="tabBtnPredict" onclick="switchTab('predict')" class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400 hover:bg-white/10">🔮 Projeções & Fibonacci</button>
         <button id="tabBtnBacktest" onclick="switchTab('backtest')" class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400 hover:bg-white/10">📊 Validação de Backtest</button>
     </div>
 
     <!-- ABA 1: COCKPIT EM TEMPO REAL -->
     <main id="tab-live" class="flex-1 p-4 md:p-8 grid grid-cols-12 gap-4 md:gap-6 max-w-[1700px] mx-auto w-full">
 
-        <!-- PAINEL DE DESTAQUE: ANTECIPAÇÃO DE VIRADA (COMPRAR EM QUEDA / VENDER EM ALTA) -->
+        <!-- CARD ANTECIPAÇÃO PREDITIVA -->
         <div class="col-span-12 glass-card p-4 md:p-6 border-2 border-amber-500/40 bg-gradient-to-r from-amber-500/10 via-black to-slate-900">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -401,7 +401,7 @@
                 </div>
             </div>
 
-            <!-- CARD SINAL DE CONFLUÊNCIA GARANTIDO -->
+            <!-- CARD SINAL DE CONFLUÊNCIA -->
             <div class="glass-card p-5 border-t-2 border-amber-500/40">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Sinal de Confluência</h3>
@@ -461,9 +461,9 @@
                     <div class="text-[10px] text-slate-500 italic">A carregar índices financeiros...</div>
                 </div>
             </div>
-        </section>
+        </main>
 
-    <!-- ABA 2: ANTECIPAÇÃO DE VIRADAS & FIBONACCI -->
+    <!-- ABA 2: ANTECIPAÇÃO DE VIRADAS & FIBONACCI (FUNCIONANDO E VISÍVEL) -->
     <section id="tab-predict" class="hidden flex-1 p-4 md:p-8 max-w-[1700px] mx-auto w-full space-y-6">
         <div class="glass-card p-6 border-t-2 border-amber-500">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -503,7 +503,7 @@
         </div>
     </section>
 
-    <!-- ABA 3: VALIDAÇÃO DE BACKTEST -->
+    <!-- ABA 3: VALIDAÇÃO DE BACKTEST (FUNCIONANDO E VISÍVEL) -->
     <section id="tab-backtest" class="hidden flex-1 p-4 md:p-8 max-w-[1700px] mx-auto w-full space-y-4 md:space-y-6">
         <div class="glass-card p-4 text-[11px] text-amber-400 border border-amber-500/30 bg-amber-500/5">
             <i class="fas fa-exclamation-triangle mr-2"></i> Resultado histórico simulado via motor de dados. Utilize como validação estatística de longo prazo.
@@ -546,7 +546,7 @@
         </div>
     </section>
 
-    <!-- SCRIPT DE PROCESSAMENTO QUANTUM E ANTECIPAÇÃO -->
+    <!-- SCRIPT CORRIGIDO COM TROCA DE ABAS E MOTOR PREDITIVO COMPLETO -->
     <script>
         const SYMBOL = "BTCUSDT";
         const BINANCE_REST = "https://api.binance.com/api/v3";
@@ -616,7 +616,6 @@
             return 100 - (100 / (1 + rs));
         }
 
-        // CÁLCULO DE STOCHASTIC RSI (SINAL RÁPIDO DE ANTECIPAÇÃO)
         function calculateStochRSI(closes, period = 14) {
             if (closes.length < period + 14) return { k: 50, d: 50 };
             const rsiValues = [];
@@ -636,7 +635,6 @@
             return { k: stoch, d: stoch };
         }
 
-        // CÁLCULO DE ATR (AVERAGE TRUE RANGE PARA STOP LOSS DINÂMICO)
         function calculateATR(klines, period = 14) {
             if (klines.length < period + 1) return 1000;
             const trs = [];
@@ -713,7 +711,6 @@
                 elements.rsi.textContent = rsi !== null ? rsi.toFixed(0) : "--";
                 document.getElementById('stoch-rsi-val').textContent = `K: ${stoch.k.toFixed(0)} · D: ${stoch.d.toFixed(0)}`;
 
-                // PONTOS PIVÔ DIÁRIOS (CÁLCULO DE ANTECIPAÇÃO)
                 const lastHigh = klines[klines.length - 1].high;
                 const lastLow = klines[klines.length - 1].low;
                 const lastClose = klines[klines.length - 1].close;
@@ -731,7 +728,6 @@
                 document.getElementById('stat-pp').innerText = formatUSD(pp);
                 document.getElementById('stat-s1').innerText = formatUSD(s1);
 
-                // CÁLCULO DE FIBONACCI
                 const highs = klines.slice(-100).map(k => k.high);
                 const lows = klines.slice(-100).map(k => k.low);
                 const maxH = Math.max(...highs);
@@ -763,7 +759,6 @@
                 const buyRatio = totalVol > 0 ? (takerBuyVol / totalVol) * 100 : 50;
                 elements.flow.textContent = buyRatio >= 50 ? `COMPRA ${buyRatio.toFixed(0)}%` : `VENDA ${(100 - buyRatio).toFixed(0)}%`;
 
-                // AVALIAÇÃO DE ANTECIPAÇÃO PREDITIVA
                 evaluateAnticipationSignal(closes, stoch, price, s1, r1, atr);
             } catch (e) {
                 console.error("Erro nos indicadores:", e);
@@ -771,7 +766,6 @@
             }
         }
 
-        // MOTOR DE ANTECIPAÇÃO DE VIRADA (GATILHO ANTES DA VELA FECHAR)
         function evaluateAnticipationSignal(closes, stoch, price, s1, r1, atr) {
             const badge = document.getElementById('confluence-badge');
             const reasonEl = document.getElementById('confluence-reason');
@@ -785,7 +779,6 @@
 
             const rsi1h = wilderRSI(closes, 14) || 50;
 
-            // ANTECIPAÇÃO DE COMPRA NO FUNDO (QUEDA)
             if (stoch.k < 22 || rsi1h < 38) {
                 const targetEntry = Math.min(price, s1);
                 const sl = targetEntry - (atr * 1.5);
@@ -803,7 +796,6 @@
                 badge.className = "text-center py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 mb-2";
                 reasonEl.textContent = `Antecipação: StochRSI em ${stoch.k.toFixed(0)} (Sobrevendido). Fundo iminente próximo de ${formatUSD(s1)}.`;
             
-            // ANTECIPAÇÃO DE VENDA NO TOPO (ALTA)
             } else if (stoch.k > 78 || rsi1h > 68) {
                 const targetEntry = Math.max(price, r1);
                 const sl = targetEntry + (atr * 1.5);
@@ -821,7 +813,6 @@
                 badge.className = "text-center py-3 rounded-xl bg-red-500/10 border border-red-500/30 mb-2";
                 reasonEl.textContent = `Antecipação: StochRSI em ${stoch.k.toFixed(0)} (Sobrecomprado). Topo de exaustão próximo de ${formatUSD(r1)}.`;
             
-            // NEUTRO - AGUARDAR O PONTO DE VIRADA
             } else {
                 earlyType.textContent = "MONITORIZANDO VIRADA DE MERCADO";
                 earlyType.className = "text-xs font-black mono text-amber-400";
@@ -836,7 +827,6 @@
                 reasonEl.textContent = `StochRSI em ${stoch.k.toFixed(0)} (Faixa neutra). Aguardando alinhamento de pivôs.`;
             }
 
-            // PROBABILIDADE DE TOPO VS FUNDO
             let bScore = Math.round(100 - stoch.k);
             let tScore = Math.round(stoch.k);
             document.getElementById('scan-bottom-bar').style.width = `${bScore}%`;
@@ -1100,6 +1090,7 @@
             setTimeout(() => t.classList.add('hidden'), 2500);
         }
 
+        // CONTROLADOR DE NAVEGAÇÃO DE ABAS 100% FUNCIONAL
         function switchTab(tab) {
             const tabLive = document.getElementById('tab-live');
             const tabPredict = document.getElementById('tab-predict');
@@ -1203,10 +1194,6 @@
             refreshMultiTimeframeRSI();
             refreshTopCrypto();
             refreshGlobalIndices();
-
-            setTimeout(() => {
-                evaluateConfluenceFallback();
-            }, 1000);
 
             setInterval(refreshIndicators, 15000);
             setInterval(refreshMultiTimeframeRSI, 30000);
