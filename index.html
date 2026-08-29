@@ -689,14 +689,14 @@
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = isBuy ? 'sine' : 'sawtooth';
-                osc.frequency.setValueAtTime(isBuy ? 587.33 : 300, audioCtx.currentTime); // Frequências distintas para Compra (D5) e Venda (Grave)
+                osc.frequency.setValueAtTime(isBuy ? 587.33 : 300, audioCtx.currentTime);
                 gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.35);
             } catch (e) {
-                console.log("Áudio bloqueado ou não suportado pelo browser", e);
+                console.log("Áudio bloqueado ou não suportado", e);
             }
         }
 
@@ -890,6 +890,10 @@
             const atr = price * 0.015;
             let currentSignal = 'NEUTRAL';
 
+            // Correção segura garantida para r1, s1 e price
+            const safeR1 = (r1 && !isNaN(r1) && r1 > 0) ? r1 : price * 1.015;
+            const safeS1 = (s1 && !isNaN(s1) && s1 > 0) ? s1 : price * 0.985;
+
             if (stochK < 25 || rsi < 40 || candleStats.rejection === 'BULLISH_PINBAR') {
                 currentSignal = 'BUY';
                 card.className = "col-span-12 glass-card p-6 border-2 pulse-card-buy transition-all";
@@ -899,7 +903,7 @@
                 desc.textContent = `Estatística de vela indica pavio inferior de rejeição (CLV: ${candleStats.clv.toFixed(2)}). O suporte S1 segurou o preço e a reversão de alta é iminente.`;
                 accuracy.textContent = "96.2%";
 
-                const entryP = Math.min(price, s1 > 0 ? s1 : price);
+                const entryP = Math.min(price, safeS1);
                 entry.textContent = formatUSD(entryP);
                 tp.textContent = formatUSD(entryP + (atr * 2.5));
                 sl.textContent = formatUSD(entryP - (atr * 1.2));
@@ -907,7 +911,7 @@
                 if (cBadge && cReason) {
                     cBadge.innerHTML = `<span class="text-lg font-black text-emerald-400">FORMAÇÃO DE FUNDO</span>`;
                     cBadge.className = "text-center py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 mb-2";
-                    cReason.textContent = `Rejeição de pavio em S1 (${formatUSD(s1)}). O candle atual vai fechar em alta.`;
+                    cReason.textContent = `Rejeição de pavio em S1 (${formatUSD(safeS1)}). O candle atual vai fechar em alta.`;
                 }
 
             } else if (stochK > 75 || rsi > 65 || candleStats.rejection === 'BEARISH_PINBAR') {
@@ -919,7 +923,7 @@
                 desc.textContent = `Estatística de vela indica pavio superior de exaustão (CLV: ${candleStats.clv.toFixed(2)}). Colisão na Resistência R1. Correção iminente.`;
                 accuracy.textContent = "94.5%";
 
-                const entryP = Math.max(price, r1 > 0 ? r1 : price);
+                const entryP = Math.max(price, safeR1);
                 entry.textContent = formatUSD(entryP);
                 tp.textContent = formatUSD(entryP - (atr * 2.5));
                 sl.textContent = formatUSD(entryP + (atr * 1.2));
@@ -927,7 +931,7 @@
                 if (cBadge && cReason) {
                     cBadge.innerHTML = `<span class="text-lg font-black text-red-400">FORMAÇÃO DE TOPO</span>`;
                     cBadge.className = "text-center py-3 rounded-xl bg-red-500/10 border border-red-500/30 mb-2";
-                    cReason.textContent = `Exaustão em R1 (${formatUSD(r1)}). O candle atual vai fechar corrigindo.`;
+                    cReason.textContent = `Exaustão em R1 (${formatUSD(safeR1)}). O candle atual vai fechar corrigindo.`;
                 }
 
             } else {
@@ -949,7 +953,7 @@
                 }
             }
 
-            // Dispara o bip sonoro apenas se houver uma mudança real de sinal
+            // Dispara o bip sonoro apenas se houver mudança real de sinal
             if (currentSignal !== liveState.lastSignalState && currentSignal !== 'NEUTRAL') {
                 playAudioAlert(currentSignal === 'BUY');
                 liveState.lastSignalState = currentSignal;
@@ -1217,7 +1221,8 @@
 
         function handleOrder(type) {
             document.getElementById('toast-msg').textContent = `ORDEM DE ${type} SIMULADA COM SUCESSO`;
-            document.getElementById('toast').classList.remove('hidden');
+            document.getElementById('toast').classList.add('hidden'); // Corrigido para garantir exibição
+            setTimeout(() => document.getElementById('toast').classList.remove('hidden'), 10);
             setTimeout(() => document.getElementById('toast').classList.add('hidden'), 2500);
         }
 
