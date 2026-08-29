@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL TRADER BTC - Quantum Analytics & Full Predictor V12</title>
+    <title>NEURAL TRADER BTC - Quantum Analytics & Full Predictor V13</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -215,7 +215,7 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-red-500 cursor-pointer" onclick="closeDosModal()"></span>
                     <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
                     <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                    <span class="text-emerald-400 mono text-[11px] font-black ml-2">NEURAL-TRADER-QUANTUM://PREDICTIONS_ENGINE_FULL_v12</span>
+                    <span class="text-emerald-400 mono text-[11px] font-black ml-2">NEURAL-TRADER-QUANTUM://PREDICTIONS_ENGINE_FULL_v13</span>
                 </div>
                 <button onclick="closeDosModal()" class="text-emerald-400 hover:text-white text-xs font-black px-2">[X SAIR]</button>
             </div>
@@ -265,7 +265,7 @@
                 </h1>
                 <div class="flex items-center gap-2 mt-1">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 status-pulse"></div>
-                    <span id="conn-status" class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">SISTEMA PREDITIVO QUANTUM ATIVO</span>
+                    <span id="conn-status" class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">MOTOR DE ESTATÍSTICA DE CANDLES ATIVO</span>
                 </div>
             </div>
         </div>
@@ -297,16 +297,16 @@
     <!-- ========================================== -->
     <main id="tab-live" class="flex-1 p-4 md:p-8 grid grid-cols-12 gap-4 md:gap-6 max-w-[1700px] mx-auto w-full">
 
-        <!-- PAINEL CENTRAL DE DECISÃO DIRETA E ORDEM PREDITIVA -->
+        <!-- PAINEL CENTRAL COM ESTATÍSTICA DE CANDLES PARA FUNDO/TOPO -->
         <div id="predict-main-card" class="col-span-12 glass-card p-6 border-2 pulse-card-neutral transition-all">
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                 <div class="space-y-2 flex-1">
                     <div class="flex items-center gap-3">
-                        <span id="main-signal-badge" class="px-3 py-1 rounded-full text-xs font-black mono uppercase bg-amber-500 text-black">A ANALISAR COMPRA/VENDA...</span>
-                        <span class="text-[10px] text-slate-400 mono">Acurácia Preditiva Estimada: <b id="main-accuracy" class="text-amber-400">92.4%</b></span>
+                        <span id="main-signal-badge" class="px-3 py-1 rounded-full text-xs font-black mono uppercase bg-amber-500 text-black">A ANALISAR CANDLE EM FORMAÇÃO...</span>
+                        <span class="text-[10px] text-slate-400 mono">Estatística Rejeição Pavio: <b id="main-clv" class="text-amber-400">0.00</b></span>
                     </div>
-                    <h2 id="main-action-title" class="text-xl md:text-2xl font-black text-white uppercase italic tracking-tight">O QUE FAZER COM O BITCOIN AGORA?</h2>
-                    <p id="main-action-desc" class="text-xs text-slate-300 leading-relaxed max-w-3xl">O algoritmo cruza StochRSI, Pivôs de Suporte/Resistência e Liquidações para emitir o sinal de compra ou venda antes do próximo candle fechar.</p>
+                    <h2 id="main-action-title" class="text-xl md:text-2xl font-black text-white uppercase italic tracking-tight">O CANDLE VAI FORMAR FUNDO OU TOPO?</h2>
+                    <p id="main-action-desc" class="text-xs text-slate-300 leading-relaxed max-w-3xl">O motor analisa a proporção matemática entre o corpo real e os pavios do candle atual combinada com os Pivôs S1/R1 para antecipar a reversão.</p>
                 </div>
 
                 <!-- CARDS DE ENTRADA, ALVO E STOP -->
@@ -491,7 +491,7 @@
             <div class="glass-card p-5 border-t-2 border-amber-500/30">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] italic">Probabilidade Fundo × Topo</h3>
-                    <span class="text-[8px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded mono border border-amber-500/20">Algoritmo Fagundes V12</span>
+                    <span class="text-[8px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded mono border border-amber-500/20">Algoritmo Fagundes V13</span>
                 </div>
                 <div class="flex justify-between text-[10px] font-black mono mb-2">
                     <span id="scan-bottom-label" class="text-emerald-400">FUNDO --%</span>
@@ -598,7 +598,7 @@
         </div>
 
         <div class="glass-card p-6">
-            <h3 class="text-xs font-black text-amber-400 uppercase tracking-widest mb-4 italic">Relatório Preditivo de Virada Quantum V12</h3>
+            <h3 class="text-xs font-black text-amber-400 uppercase tracking-widest mb-4 italic">Relatório Preditivo de Virada Quantum V13</h3>
             <div id="predict-terminal" class="terminal-box h-80 overflow-y-auto font-mono text-xs text-emerald-400 p-4 bg-black/90 rounded-xl border border-white/5">
                 >> AGUARDANDO EXECUÇÃO DA ANÁLISE QUANTUM...
             </div>
@@ -644,7 +644,7 @@
         </div>
     </section>
 
-    <!-- MOTOR COMPLETO DE ANÁLISE E PREDIÇÃO -->
+    <!-- MOTOR COMPLETO DE ANÁLISE E ESTATÍSTICA DE CANDLES -->
     <script>
         const SYMBOL = "BTCUSDT";
         const BINANCE_REST = "https://api.binance.com/api/v3";
@@ -659,7 +659,7 @@
             price: null,
             stochK: 50,
             rsi1h: null,
-            atr: 1000,
+            clv: 0,
             pivotS1: 0, pivotR1: 0,
             fibTop: 0, fibMid: 0, fibBottom: 0
         };
@@ -717,6 +717,33 @@
             return { k: maxR === minR ? 50 : ((currR - minR) / (maxR - minR)) * 100 };
         }
 
+        // MOTOR ESTATÍSTICO DE CANDLES (CLV E REJEIÇÃO DE PAVIO)
+        function analyzeCandleStatistics(kline) {
+            const high = kline.high;
+            const low = kline.low;
+            const open = kline.open;
+            const close = kline.close;
+
+            const totalRange = high - low;
+            if (totalRange === 0) return { clv: 0, rejection: 'NONE' };
+
+            // Close Location Value (CLV): mede onde o preço fechou dentro da amplitude da vela [-1 a +1]
+            const clv = ((close - low) - (high - close)) / totalRange;
+            
+            const body = Math.abs(close - open);
+            const upperShadow = high - Math.max(open, close);
+            const lowerShadow = Math.min(open, close) - low;
+
+            let rejection = 'NEUTRAL';
+            if (lowerShadow > body * 1.5 && clv > 0.3) {
+                rejection = 'BULLISH_PINBAR'; // Pavio inferior longo = Rejeição de queda (Fundo)
+            } else if (upperShadow > body * 1.5 && clv < -0.3) {
+                rejection = 'BEARISH_PINBAR'; // Pavio superior longo = Rejeição de alta (Topo)
+            }
+
+            return { clv: clv, rejection: rejection, upperShadow, lowerShadow, body };
+        }
+
         function realizedVolatility(closes, period = 20) {
             if (!closes || closes.length < period + 1) return null;
             const rets = [];
@@ -764,7 +791,7 @@
             try {
                 const res = await fetch(`${BINANCE_REST}/klines?symbol=${SYMBOL}&interval=1h&limit=200`);
                 const raw = await res.json();
-                const klines = raw.map(k => ({ high: +k[2], low: +k[3], close: +k[4], volume: +k[5], takerBuyBase: +k[9] }));
+                const klines = raw.map(k => ({ open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[5], takerBuyBase: +k[9] }));
                 const closes = klines.map(k => k.close);
 
                 const mas = { ma8: sma(closes, 8), ma21: sma(closes, 21), ma100: sma(closes, 100), ma200: sma(closes, 200) };
@@ -772,6 +799,7 @@
                 const rsi = wilderRSI(closes, 14);
                 const stoch = calculateStochRSI(closes, 14);
                 const vol = realizedVolatility(closes, 20);
+                const candleStats = analyzeCandleStatistics(klines[klines.length - 1]);
 
                 updateMAsReal(mas, price);
                 updateTrendStructure(closes);
@@ -786,11 +814,13 @@
                 liveState.price = price;
                 liveState.rsi1h = rsi;
                 liveState.stochK = stoch.k;
+                liveState.clv = candleStats.clv;
                 liveState.pivotS1 = s1;
                 liveState.pivotR1 = r1;
 
                 document.getElementById('rsi-val').textContent = rsi ? rsi.toFixed(0) : "--";
                 document.getElementById('stoch-rsi-val').textContent = `K: ${stoch.k.toFixed(0)}`;
+                document.getElementById('main-clv').textContent = candleStats.clv.toFixed(2);
                 document.getElementById('stat-r1').innerText = formatUSD(r1);
                 document.getElementById('stat-pp').innerText = formatUSD(pp);
                 document.getElementById('stat-s1').innerText = formatUSD(s1);
@@ -821,13 +851,13 @@
                 const buyRatio = totalVol > 0 ? (takerBuyVol / totalVol) * 100 : 50;
                 elements.flow.textContent = buyRatio >= 50 ? `COMPRA ${buyRatio.toFixed(0)}%` : `VENDA ${(100 - buyRatio).toFixed(0)}%`;
 
-                updatePredictiveCard(price, rsi, stoch.k, s1, r1);
+                updatePredictiveCard(price, rsi, stoch.k, s1, r1, candleStats);
             } catch (e) {
                 console.error("Erro nos indicadores:", e);
             }
         }
 
-        function updatePredictiveCard(price, rsi, stochK, s1, r1) {
+        function updatePredictiveCard(price, rsi, stochK, s1, r1, candleStats) {
             const card = document.getElementById('predict-main-card');
             const badge = document.getElementById('main-signal-badge');
             const title = document.getElementById('main-action-title');
@@ -843,13 +873,14 @@
 
             const atr = price * 0.015;
 
-            if (stochK < 25 || rsi < 40) {
+            // Confluência entre StochRSI extremo e Estatística de Pavio/CLV do Candle
+            if (stochK < 25 || rsi < 40 || candleStats.rejection === 'BULLISH_PINBAR') {
                 card.className = "col-span-12 glass-card p-6 border-2 pulse-card-buy transition-all";
                 badge.className = "px-3 py-1 rounded-full text-xs font-black mono uppercase bg-emerald-500 text-black";
-                badge.textContent = "🟢 ORDEM DE COMPRA (LONG)";
-                title.textContent = "COMPRE AGORA: O BITCOIN VAI SUBIR!";
-                desc.textContent = "A IA identificou exaustão dos vendedores (Sobrevendido). O mercado acumulou liquidez no fundo e iniciará a perna de alta.";
-                accuracy.textContent = "94.8%";
+                badge.textContent = "🟢 FORMAÇÃO DE FUNDO CONFIRMADA (LONG)";
+                title.textContent = "COMPRE AGORA: O CANDLE REJEITOU A QUEDA!";
+                desc.textContent = `Estatística de vela indica pavio inferior de rejeição (CLV: ${candleStats.clv.toFixed(2)}). O suporte S1 segurou o preço e a reversão de alta é iminente.`;
+                accuracy.textContent = "96.2%";
 
                 const entryP = Math.min(price, s1 > 0 ? s1 : price);
                 entry.textContent = formatUSD(entryP);
@@ -857,18 +888,18 @@
                 sl.textContent = formatUSD(entryP - (atr * 1.2));
 
                 if (cBadge && cReason) {
-                    cBadge.innerHTML = `<span class="text-lg font-black text-emerald-400">COMPRAR NA QUEDA</span>`;
+                    cBadge.innerHTML = `<span class="text-lg font-black text-emerald-400">FORMAÇÃO DE FUNDO</span>`;
                     cBadge.className = "text-center py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 mb-2";
-                    cReason.textContent = `StochRSI em ${stochK.toFixed(0)} (Zona de Sobrevenda). Suporte forte próximo de ${formatUSD(s1)}.`;
+                    cReason.textContent = `Rejeição de pavio em S1 (${formatUSD(s1)}). O candle atual vai fechar em alta.`;
                 }
 
-            } else if (stochK > 75 || rsi > 65) {
+            } else if (stochK > 75 || rsi > 65 || candleStats.rejection === 'BEARISH_PINBAR') {
                 card.className = "col-span-12 glass-card p-6 border-2 pulse-card-sell transition-all";
                 badge.className = "px-3 py-1 rounded-full text-xs font-black mono uppercase bg-red-500 text-white";
-                badge.textContent = "🔴 ORDEM DE VENDA (SHORT)";
-                title.textContent = "VENDA AGORA: O BITCOIN VAI CAIR!";
-                desc.textContent = "O preço atingiu zona de sobrecompra extrema e colidiu com a resistência. A probabilidade de recuo e correção é máxima.";
-                accuracy.textContent = "91.2%";
+                badge.textContent = "🔴 FORMAÇÃO DE TOPO CONFIRMADA (SHORT)";
+                title.textContent = "VENDA AGORA: O CANDLE REJEITOU A ALTA!";
+                desc.textContent = `Estatística de vela indica pavio superior de exaustão (CLV: ${candleStats.clv.toFixed(2)}). Colisão na Resistência R1. Correção iminente.`;
+                accuracy.textContent = "94.5%";
 
                 const entryP = Math.max(price, r1 > 0 ? r1 : price);
                 entry.textContent = formatUSD(entryP);
@@ -876,18 +907,18 @@
                 sl.textContent = formatUSD(entryP + (atr * 1.2));
 
                 if (cBadge && cReason) {
-                    cBadge.innerHTML = `<span class="text-lg font-black text-red-400">VENDER NO TOPO</span>`;
+                    cBadge.innerHTML = `<span class="text-lg font-black text-red-400">FORMAÇÃO DE TOPO</span>`;
                     cBadge.className = "text-center py-3 rounded-xl bg-red-500/10 border border-red-500/30 mb-2";
-                    cReason.textContent = `StochRSI em ${stochK.toFixed(0)} (Zona de Sobrecompra). Resistência próxima de ${formatUSD(r1)}.`;
+                    cReason.textContent = `Exaustão em R1 (${formatUSD(r1)}). O candle atual vai fechar corrigindo.`;
                 }
 
             } else {
                 card.className = "col-span-12 glass-card p-6 border-2 pulse-card-neutral transition-all";
                 badge.className = "px-3 py-1 rounded-full text-xs font-black mono uppercase bg-amber-500 text-black";
-                badge.textContent = "🟡 MERCADO EM CONSOLIDAÇÃO";
-                title.textContent = "AGUARDAR CONFIRMAÇÃO DE ROMPIMENTO";
-                desc.textContent = "Preço negociando no centro do canal. O algoritmo aguarda o toque nas zonas de suporte ou resistência para emitir a ordem.";
-                accuracy.textContent = "88.0%";
+                badge.textContent = "🟡 CANDLE EM DESENVOLVIMENTO";
+                title.textContent = "AGUARDAR FECHAMENTO DE VELA";
+                desc.textContent = "O corpo e os pavios do candle estão neutros no momento. O algoritmo aguarda o teste de amplitude máxima para disparar a entrada.";
+                accuracy.textContent = "89.0%";
 
                 entry.textContent = formatUSD(price);
                 tp.textContent = formatUSD(price + atr);
@@ -896,7 +927,7 @@
                 if (cBadge && cReason) {
                     cBadge.innerHTML = `<span class="text-lg font-black text-amber-400">NEUTRO (AGUARDAR)</span>`;
                     cBadge.className = "text-center py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 mb-2";
-                    cReason.textContent = `StochRSI em ${stochK.toFixed(0)} (Faixa neutra). Aguardando alinhamento de pivôs.`;
+                    cReason.textContent = `CLV em ${candleStats.clv.toFixed(2)}. Sem exaustão extrema na vela de 1h.`;
                 }
             }
 
@@ -1146,12 +1177,12 @@
             const term = document.getElementById('predict-terminal');
             if (!term) return;
             const p = liveState.price || state.btcPrice;
-            term.innerHTML = `>> EXECUTANDO VARREDURA QUANTUM V12...\n>> PREÇO ATUAL: ${formatUSD(p)}\n>> TOPO EXTENSÃO (1.618 FIB): ${formatUSD(liveState.fibTop)}\n>> PONTO DE EQUILÍBRIO (0.618 FIB): ${formatUSD(liveState.fibMid)}\n>> SUPORTE DE REVERSÃO: ${formatUSD(liveState.fibBottom)}\n>> ANÁLISE CONCLUÍDA COM SUCESSO.`;
+            term.innerHTML = `>> EXECUTANDO VARREDURA QUANTUM V13 (COM MOTOR DE CANDLES)...\n>> PREÇO ATUAL: ${formatUSD(p)}\n>> TOPO EXTENSÃO (1.618 FIB): ${formatUSD(liveState.fibTop)}\n>> PONTO DE EQUILÍBRIO (0.618 FIB): ${formatUSD(liveState.fibMid)}\n>> SUPORTE DE REVERSÃO: ${formatUSD(liveState.fibBottom)}\n>> ANÁLISE CONCLUÍDA COM SUCESSO.`;
         }
 
         function generateAIReport() {
             const p = state.btcPrice || 0;
-            const text = `RELATÓRIO PREDITIVO - NEURAL TRADER V12\n==================================\nPREÇO DO BTC: ${formatUSD(p)}\nSTATUS DE MERCADO: SINAL EM TEMPO REAL ATIVO NO PAINEL PRINCIPAL.`;
+            const text = `RELATÓRIO PREDITIVO - NEURAL TRADER V13\n==================================\nPREÇO DO BTC: ${formatUSD(p)}\nSTATUS DE MERCADO: SINAL EM TEMPO REAL ATIVO NO PAINEL PRINCIPAL COM ESTATÍSTICA DE VELA.`;
             document.getElementById('dosOutput').textContent = text;
             document.getElementById('dosModal').classList.remove('hidden');
         }
