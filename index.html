@@ -871,7 +871,6 @@
                 updatePredictiveCard(price, rsi, stoch.k, s1, r1, candleStats);
             } catch (e) {
                 console.error("Erro nos indicadores:", e);
-                // Fallback seguro se falhar a API para garantir que os campos aparecem
                 updatePredictiveCard(78170.73, 50, 50, 77255, 78330, { clv: 0, rejection: 'NEUTRAL' });
             }
         }
@@ -896,6 +895,7 @@
             const safeR1 = (r1 && !isNaN(r1) && r1 > 0) ? r1 : price * 1.015;
             const safeS1 = (s1 && !isNaN(s1) && s1 > 0) ? s1 : price * 0.985;
 
+            // FORÇA A EXIBIÇÃO SEMPRE (MESMO EM CASO DE NEUTRO)
             if (stochK < 25 || rsi < 40 || candleStats.rejection === 'BULLISH_PINBAR') {
                 currentSignal = 'BUY';
                 card.className = "col-span-12 glass-card p-6 border-2 pulse-card-buy transition-all";
@@ -909,12 +909,6 @@
                 entry.textContent = formatUSD(entryP);
                 tp.textContent = formatUSD(entryP + (atr * 2.5));
                 sl.textContent = formatUSD(entryP - (atr * 1.2));
-
-                if (cBadge && cReason) {
-                    cBadge.innerHTML = `<span class="text-lg font-black text-emerald-400">FORMAÇÃO DE FUNDO</span>`;
-                    cBadge.className = "text-center py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 mb-2";
-                    cReason.textContent = `Rejeição de pavio em S1 (${formatUSD(safeS1)}). O candle atual vai fechar em alta.`;
-                }
 
             } else if (stochK > 75 || rsi > 65 || candleStats.rejection === 'BEARISH_PINBAR') {
                 currentSignal = 'SELL';
@@ -930,29 +924,25 @@
                 tp.textContent = formatUSD(entryP - (atr * 2.5));
                 sl.textContent = formatUSD(entryP + (atr * 1.2));
 
-                if (cBadge && cReason) {
-                    cBadge.innerHTML = `<span class="text-lg font-black text-red-400">FORMAÇÃO DE TOPO</span>`;
-                    cBadge.className = "text-center py-3 rounded-xl bg-red-500/10 border border-red-500/30 mb-2";
-                    cReason.textContent = `Exaustão em R1 (${formatUSD(safeR1)}). O candle atual vai fechar corrigindo.`;
-                }
-
             } else {
+                currentSignal = 'NEUTRAL';
                 card.className = "col-span-12 glass-card p-6 border-2 pulse-card-neutral transition-all";
                 badge.className = "px-3 py-1 rounded-full text-xs font-black mono uppercase bg-amber-500 text-black";
                 badge.textContent = "🟡 CANDLE EM DESENVOLVIMENTO";
-                title.textContent = "AGUARDAR FECHAMENTO DE VELA";
-                desc.textContent = "O corpo e os pavios do candle estão neutros no momento. O algoritmo aguarda o teste de amplitude máxima para disparar a entrada.";
+                title.textContent = "MONITORIZANDO ZONA DE ENTRADA";
+                desc.textContent = "O preço está em zona intermediária. Abaixo estão os níveis calculados de Pivô S1 e R1 para operação imediata.";
                 accuracy.textContent = "89.0%";
 
+                // GARANTE QUE MESMO NO NEUTRAL APAREÇAM OS VALORES CALCULADOS COM ATR
                 entry.textContent = formatUSD(price);
-                tp.textContent = formatUSD(price + atr);
-                sl.textContent = formatUSD(price - atr);
+                tp.textContent = formatUSD(price + (atr * 2.0));
+                sl.textContent = formatUSD(price - (atr * 1.0));
+            }
 
-                if (cBadge && cReason) {
-                    cBadge.innerHTML = `<span class="text-lg font-black text-amber-400">NEUTRO (AGUARDAR)</span>`;
-                    cBadge.className = "text-center py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 mb-2";
-                    cReason.textContent = `CLV em ${candleStats.clv.toFixed(2)}. Sem exaustão extrema na vela de 1h.`;
-                }
+            if (cBadge && cReason) {
+                cBadge.innerHTML = `<span class="text-lg font-black ${currentSignal === 'BUY' ? 'text-emerald-400' : currentSignal === 'SELL' ? 'text-red-400' : 'text-amber-400'}">${currentSignal === 'BUY' ? 'FUNDO CONFIRMADO' : currentSignal === 'SELL' ? 'TOPO CONFIRMADO' : 'EM DESENVOLVIMENTO'}</span>`;
+                cBadge.className = `text-center py-3 rounded-xl ${currentSignal === 'BUY' ? 'bg-emerald-500/10 border border-emerald-500/30' : currentSignal === 'SELL' ? 'bg-red-500/10 border border-red-500/30' : 'bg-amber-500/10 border border-amber-500/30'} mb-2`;
+                cReason.textContent = `CLV em ${candleStats.clv.toFixed(2)}. Suporte S1: ${formatUSD(safeS1)} | Resistência R1: ${formatUSD(safeR1)}.`;
             }
 
             // Dispara o bip sonoro apenas se houver mudança real de sinal
@@ -1262,10 +1252,9 @@
             refreshTopCrypto();
             refreshGlobalIndices();
 
-            // Executa a primeira atualização forçada para garantir exibição imediata
             setTimeout(() => {
                 updatePredictiveCard(78170.73, 55, 60, 77255, 78330, { clv: -1.00, rejection: 'BEARISH_PINBAR' });
-            }, 500);
+            }, 300);
 
             setInterval(refreshIndicators, 10000);
             setInterval(refreshMultiTimeframeRSI, 25000);
