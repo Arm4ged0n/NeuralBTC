@@ -228,8 +228,11 @@
     <!-- TICKER ESTILO BOLSA DE VALORES DA DIREITA PARA A ESQUERDA -->
     <div class="ticker-container">
         <div class="ticker-wrapper" id="ticker-content">
-            <!-- Gerado via JavaScript dinamicamente com dados da Binance -->
-            <div class="ticker-item"><span class="text-slate-500 font-bold">BTC/USDT</span><span class="text-white">$ --,---.--</span><span class="text-emerald-400">+0.00%</span></div>
+            <div class="ticker-item"><span class="text-slate-400 font-bold">BTC/USDT</span><span class="text-white font-bold">$ --,---.--</span><span class="text-emerald-400">+0.00%</span></div>
+            <div class="ticker-item"><span class="text-slate-400 font-bold">ETH/USDT</span><span class="text-white font-bold">$ --,---.--</span><span class="text-emerald-400">+0.00%</span></div>
+            <div class="ticker-item"><span class="text-slate-400 font-bold">SOL/USDT</span><span class="text-white font-bold">$ --,---.--</span><span class="text-emerald-400">+0.00%</span></div>
+            <div class="ticker-item"><span class="text-slate-400 font-bold">BNB/USDT</span><span class="text-white font-bold">$ --,---.--</span><span class="text-emerald-400">+0.00%</span></div>
+            <div class="ticker-item"><span class="text-slate-400 font-bold">XRP/USDT</span><span class="text-white font-bold">$ --,---.--</span><span class="text-emerald-400">+0.00%</span></div>
         </div>
     </div>
 
@@ -300,13 +303,13 @@
                 <div class="space-y-2 flex-1">
                     <div class="flex items-center gap-3">
                         <span id="main-signal-badge" class="px-3 py-1 rounded-full text-xs font-black mono uppercase bg-amber-500 text-black">A ANALISAR COMPRA/VENDA...</span>
-                        <span class="text-[10px] text-slate-400 mono">Acurácia Preditiva Estimada: <b id="main-accuracy" class="text-amber-400">94.8%</b></span>
+                        <span class="text-[10px] text-slate-400 mono">Acurácia Preditiva Estimada: <b id="main-accuracy" class="text-amber-400">92.4%</b></span>
                     </div>
                     <h2 id="main-action-title" class="text-xl md:text-2xl font-black text-white uppercase italic tracking-tight">O QUE FAZER COM O BITCOIN AGORA?</h2>
                     <p id="main-action-desc" class="text-xs text-slate-300 leading-relaxed max-w-3xl">O algoritmo cruza StochRSI, Pivôs de Suporte/Resistência e Liquidações para emitir o sinal de compra ou venda antes do próximo candle fechar.</p>
                 </div>
 
-                <!-- CARDS DE PREÇO DE ENTRADA, TAKE PROFIT E STOP LOSS -->
+                <!-- CARDS DE ENTRADA, ALVO E STOP -->
                 <div class="grid grid-cols-3 gap-3 w-full lg:w-auto bg-black/60 p-4 rounded-2xl border border-white/10">
                     <div class="text-center px-2">
                         <span class="text-[9px] text-slate-400 uppercase font-black block mb-1">Preço de Entrada</span>
@@ -324,7 +327,7 @@
             </div>
         </div>
 
-        <!-- COLUNA 1: PSICOLOGIA E CLUSTER DE MÉDIAS MÓVEIS -->
+        <!-- COLUNA 1: PSICOLOGIA E CLUSTER DE MÉDIAS -->
         <div class="col-span-12 lg:col-span-3 order-2 lg:order-1 space-y-4 md:space-y-6">
             <div class="glass-card p-6 relative overflow-hidden border-t-2 border-amber-500/30">
                 <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 text-center italic">Psicologia do Mercado (Fear & Greed)</h3>
@@ -417,7 +420,7 @@
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div class="glass-card p-3 text-center">
-                    <p class="text-[8px] text-slate-400 uppercase mb-1">Resistência (R1)</p>
+                    <p class="text-[8px] text-slate-400 uppercase mb-1">Pivô R1 (Resistência)</p>
                     <p id="stat-r1" class="mono text-[12px] font-black text-red-400">$ --</p>
                 </div>
                 <div class="glass-card p-3 text-center">
@@ -425,7 +428,7 @@
                     <p id="stat-pp" class="mono text-[12px] font-black text-amber-400">$ --</p>
                 </div>
                 <div class="glass-card p-3 text-center">
-                    <p class="text-[8px] text-slate-400 uppercase mb-1">Suporte (S1)</p>
+                    <p class="text-[8px] text-slate-400 uppercase mb-1">Pivô S1 (Suporte)</p>
                     <p id="stat-s1" class="mono text-[12px] font-black text-emerald-400">$ --</p>
                 </div>
                 <div class="glass-card p-3 text-center">
@@ -661,21 +664,7 @@
             fibTop: 0, fibMid: 0, fibBottom: 0
         };
 
-        const state = {
-            btcPrice: 0,
-            tickerData: {
-                "BTC": { p: 0, c: 0 },
-                "ETH": { p: 0, c: 0 },
-                "SOL": { p: 0, c: 0 },
-                "BNB": { p: 0, c: 0 },
-                "XRP": { p: 0, c: 0 },
-                "ADA": { p: 0, c: 0 },
-                "DOGE": { p: 0, c: 0 },
-                "DOT": { p: 0, c: 0 },
-                "LINK": { p: 0, c: 0 },
-                "AVAX": { p: 0, c: 0 }
-            }
-        };
+        const state = { btcPrice: 0, tickerData: { "BTC": { p: 0, c: 0 }, "ETH": { p: 0, c: 0 }, "SOL": { p: 0, c: 0 }, "BNB": { p: 0, c: 0 }, "XRP": { p: 0, c: 0 }, "ADA": { p: 0, c: 0 }, "DOGE": { p: 0, c: 0 }, "DOT": { p: 0, c: 0 }, "LINK": { p: 0, c: 0 }, "AVAX": { p: 0, c: 0 } } };
 
         const elements = {
             price: document.getElementById('live-price'),
@@ -1093,26 +1082,17 @@
             loadChartData(interval);
         }
 
-        // TICKER DE BOLSA DE VALORES DA DIREITA PARA A ESQUERDA
         function renderTicker() {
             const content = Object.entries(state.tickerData).map(([s, d]) => {
                 const isPos = d.c >= 0;
-                return `<div class="ticker-item">
-                    <span class="text-slate-400 font-bold">${s}/USDT</span>
-                    <span class="text-white font-bold">${formatUSD(d.p)}</span>
-                    <span class="${isPos ? 'text-emerald-400' : 'text-red-400'} font-black">${isPos ? '▲' : '▼'} ${d.c.toFixed(2)}%</span>
-                </div>`;
+                return `<div class="ticker-item"><span class="text-slate-400 font-bold">${s}/USDT</span><span class="text-white font-bold">${formatUSD(d.p)}</span><span class="${isPos ? 'text-emerald-400' : 'text-red-400'} font-black">${isPos ? '▲' : '▼'} ${d.c.toFixed(2)}%</span></div>`;
             }).join('');
-            
-            // Duplicar conteúdo para criar efeito de scroll infinito fluido sem interrupções
             elements.ticker.innerHTML = content + content + content + content;
         }
 
         function initWebSocket() {
             const symbols = ['btcusdt', 'ethusdt', 'solusdt', 'bnbusdt', 'xrpusdt', 'adausdt', 'dogeusdt', 'dotusdt', 'linkusdt', 'avaxusdt'];
-            const streamPath = symbols.map(s => `${s}@ticker`).join('/');
-            const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${streamPath}`);
-            
+            const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbols.map(s => `${s}@ticker`).join('/')}`);
             ws.onmessage = (e) => {
                 const data = JSON.parse(e.data);
                 const sym = data.s.replace('USDT', '');
@@ -1141,9 +1121,9 @@
             tabPredict.classList.add('hidden');
             tabBacktest.classList.add('hidden');
 
-            document.getElementById('tabBtnLive').className = "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400";
-            document.getElementById('tabBtnPredict').className = "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400";
-            document.getElementById('tabBtnBacktest').className = "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400";
+            document.getElementById('tabBtnLive').className = "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400 hover:bg-white/10";
+            document.getElementById('tabBtnPredict').className = "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400 hover:bg-white/10";
+            document.getElementById('tabBtnBacktest').className = "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 text-slate-400 hover:bg-white/10";
 
             if (tab === 'live') {
                 tabLive.classList.remove('hidden');
@@ -1166,12 +1146,12 @@
             const term = document.getElementById('predict-terminal');
             if (!term) return;
             const p = liveState.price || state.btcPrice;
-            term.innerHTML = `>> EXECUTANDO VARREDURA QUANTUM V12 FULL...\n>> PREÇO ATUAL DO BITCOIN: ${formatUSD(p)}\n>> TOPO EXTENSÃO (1.618 FIB): ${formatUSD(liveState.fibTop)}\n>> PONTO DE EQUILÍBRIO (0.618 FIB): ${formatUSD(liveState.fibMid)}\n>> SUPORTE DE REVERSÃO: ${formatUSD(liveState.fibBottom)}\n>> MULTI-TIMEFRAME STOCHASTIC RSI: ATIVO (DIVERGÊNCIA EM MONITORAMENTO)\n>> ANÁLISE DE MERCADO CONCLUÍDA COM SUCESSO.`;
+            term.innerHTML = `>> EXECUTANDO VARREDURA QUANTUM V12...\n>> PREÇO ATUAL: ${formatUSD(p)}\n>> TOPO EXTENSÃO (1.618 FIB): ${formatUSD(liveState.fibTop)}\n>> PONTO DE EQUILÍBRIO (0.618 FIB): ${formatUSD(liveState.fibMid)}\n>> SUPORTE DE REVERSÃO: ${formatUSD(liveState.fibBottom)}\n>> ANÁLISE CONCLUÍDA COM SUCESSO.`;
         }
 
         function generateAIReport() {
             const p = state.btcPrice || 0;
-            const text = `RELATÓRIO PREDITIVO COMPLETO - NEURAL TRADER V12\n======================================================\nPREÇO DO BTC: ${formatUSD(p)}\nSTATUS DE MERCADO: SINAL EM TEMPO REAL ATIVO NO PAINEL PRINCIPAL.\n\nSINAIS DETECTADOS:\n- STOCHRSI (1H): ESTÁVEL\n- CLUSTER EMAS: EM ALINHAMENTO\n- PIVÔS DIÁRIOS: CALCULADOS COM SUCESSO.`;
+            const text = `RELATÓRIO PREDITIVO - NEURAL TRADER V12\n==================================\nPREÇO DO BTC: ${formatUSD(p)}\nSTATUS DE MERCADO: SINAL EM TEMPO REAL ATIVO NO PAINEL PRINCIPAL.`;
             document.getElementById('dosOutput').textContent = text;
             document.getElementById('dosModal').classList.remove('hidden');
         }
@@ -1194,7 +1174,7 @@
             if (rect.width === 0) return;
             canvas.width = rect.width * dpr;
             canvas.height = 260 * dpr;
-            ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d');
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, rect.width, 260);
 
