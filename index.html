@@ -644,7 +644,7 @@
         </div>
     </section>
 
-    <!-- MOTOR COMPLETO DE ANÁLISE E ESTATÍSTICA DE CANDLES -->
+    <!-- MOTOR COMPLETO DE ANÁLISE, ESTATÍSTICA DE CANDLES E ALERTA SONORO -->
     <script>
         const SYMBOL = "BTCUSDT";
         const BINANCE_REST = "https://api.binance.com/api/v3";
@@ -661,7 +661,8 @@
             rsi1h: null,
             clv: 0,
             pivotS1: 0, pivotR1: 0,
-            fibTop: 0, fibMid: 0, fibBottom: 0
+            fibTop: 0, fibMid: 0, fibBottom: 0,
+            lastSignalState: null
         };
 
         const state = { btcPrice: 0, tickerData: { "BTC": { p: 0, c: 0 }, "ETH": { p: 0, c: 0 }, "SOL": { p: 0, c: 0 }, "BNB": { p: 0, c: 0 }, "XRP": { p: 0, c: 0 }, "ADA": { p: 0, c: 0 }, "DOGE": { p: 0, c: 0 }, "DOT": { p: 0, c: 0 }, "LINK": { p: 0, c: 0 }, "AVAX": { p: 0, c: 0 } } };
@@ -680,6 +681,24 @@
             maValues: { ma8: document.getElementById('ma8-val'), ma21: document.getElementById('ma21-val'), ma100: document.getElementById('ma100-val'), ma200: document.getElementById('ma200-val') },
             maBars: { ma8: document.getElementById('ma8-bar'), ma21: document.getElementById('ma21-bar'), ma100: document.getElementById('ma100-bar'), ma200: document.getElementById('ma200-bar') }
         };
+
+        // SISTEMA DE ALERTA SONORO (WEB AUDIO API)
+        function playAudioAlert(isBuy) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = isBuy ? 'sine' : 'sawtooth';
+                osc.frequency.setValueAtTime(isBuy ? 587.33 : 300, audioCtx.currentTime); // Frequências distintas para Compra (D5) e Venda (Grave)
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+            } catch (e) {
+                console.log("Áudio bloqueado ou não suportado pelo browser", e);
+            }
+        }
 
         function sma(closes, period) {
             if (!closes || closes.length < period) return null;
@@ -717,7 +736,6 @@
             return { k: maxR === minR ? 50 : ((currR - minR) / (maxR - minR)) * 100 };
         }
 
-        // MOTOR ESTATÍSTICO DE CANDLES (CLV E REJEIÇÃO DE PAVIO)
         function analyzeCandleStatistics(kline) {
             const high = kline.high;
             const low = kline.low;
@@ -727,18 +745,16 @@
             const totalRange = high - low;
             if (totalRange === 0) return { clv: 0, rejection: 'NONE' };
 
-            // Close Location Value (CLV): mede onde o preço fechou dentro da amplitude da vela [-1 a +1]
             const clv = ((close - low) - (high - close)) / totalRange;
-            
             const body = Math.abs(close - open);
             const upperShadow = high - Math.max(open, close);
             const lowerShadow = Math.min(open, close) - low;
 
             let rejection = 'NEUTRAL';
             if (lowerShadow > body * 1.5 && clv > 0.3) {
-                rejection = 'BULLISH_PINBAR'; // Pavio inferior longo = Rejeição de queda (Fundo)
+                rejection = 'BULLISH_PINBAR';
             } else if (upperShadow > body * 1.5 && clv < -0.3) {
-                rejection = 'BEARISH_PINBAR'; // Pavio superior longo = Rejeição de alta (Topo)
+                rejection = 'BEARISH_PINBAR';
             }
 
             return { clv: clv, rejection: rejection, upperShadow, lowerShadow, body };
@@ -872,9 +888,10 @@
             const cReason = document.getElementById('confluence-reason');
 
             const atr = price * 0.015;
+            let currentSignal = 'NEUTRAL';
 
-            // Confluência entre StochRSI extremo e Estatística de Pavio/CLV do Candle
             if (stochK < 25 || rsi < 40 || candleStats.rejection === 'BULLISH_PINBAR') {
+                currentSignal = 'BUY';
                 card.className = "col-span-12 glass-card p-6 border-2 pulse-card-buy transition-all";
                 badge.className = "px-3 py-1 rounded-full text-xs font-black mono uppercase bg-emerald-500 text-black";
                 badge.textContent = "🟢 FORMAÇÃO DE FUNDO CONFIRMADA (LONG)";
@@ -894,6 +911,7 @@
                 }
 
             } else if (stochK > 75 || rsi > 65 || candleStats.rejection === 'BEARISH_PINBAR') {
+                currentSignal = 'SELL';
                 card.className = "col-span-12 glass-card p-6 border-2 pulse-card-sell transition-all";
                 badge.className = "px-3 py-1 rounded-full text-xs font-black mono uppercase bg-red-500 text-white";
                 badge.textContent = "🔴 FORMAÇÃO DE TOPO CONFIRMADA (SHORT)";
@@ -929,6 +947,12 @@
                     cBadge.className = "text-center py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 mb-2";
                     cReason.textContent = `CLV em ${candleStats.clv.toFixed(2)}. Sem exaustão extrema na vela de 1h.`;
                 }
+            }
+
+            // Dispara o bip sonoro apenas se houver uma mudança real de sinal
+            if (currentSignal !== liveState.lastSignalState && currentSignal !== 'NEUTRAL') {
+                playAudioAlert(currentSignal === 'BUY');
+                liveState.lastSignalState = currentSignal;
             }
 
             const bScore = Math.round(100 - stochK);
@@ -1182,7 +1206,7 @@
 
         function generateAIReport() {
             const p = state.btcPrice || 0;
-            const text = `RELATÓRIO PREDITIVO - NEURAL TRADER V13\n==================================\nPREÇO DO BTC: ${formatUSD(p)}\nSTATUS DE MERCADO: SINAL EM TEMPO REAL ATIVO NO PAINEL PRINCIPAL COM ESTATÍSTICA DE VELA.`;
+            const text = `RELATÓRIO PREDITIVO - NEURAL TRADER V13\n==================================\nPREÇO DO BTC: ${formatUSD(p)}\nSTATUS DE MERCADO: SINAL EM TEMPO REAL ATIVO NO PAINEL PRINCIPAL COM ESTATÍSTICA DE VELA E ALERTA SONORO.`;
             document.getElementById('dosOutput').textContent = text;
             document.getElementById('dosModal').classList.remove('hidden');
         }
